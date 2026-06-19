@@ -1,6 +1,6 @@
 {
   "name": "daisycode",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "AI Coding Agent runtime — lightweight, extensible, MCP-powered",
   "type": "module",
   "bin": {
@@ -26,10 +26,10 @@
     "dev": "tsx src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "node --import tsx --test tests/",
+    "test": "node --import tsx --test \"tests/**/*.test.ts\"",
     "lint": "eslint src/ tests/",
     "format": "prettier --write src/ tests/",
-    "coverage": "c8 --reporter=text --reporter=lcov node --import tsx --test tests/"
+    "coverage": "c8 --reporter=text --reporter=lcov node --import tsx --test \"tests/**/*.test.ts\""
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
