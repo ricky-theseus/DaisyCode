@@ -72,7 +72,7 @@ export const grepTool: Tool = {
     walkFiles(cwd, cwd, include, files);
 
     for (const fullPath of files) {
-      if (!existsSync(fullPath)) continue;
+      if (!existsSync(fullPath)) {continue;}
       try {
         const content = readFileSync(fullPath, 'utf-8');
         const lines = content.split('\n');

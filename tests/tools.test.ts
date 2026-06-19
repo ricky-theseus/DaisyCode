@@ -14,7 +14,7 @@ const testFile = join(testDir, 'hello.txt');
 const ctx: ToolContext = { agent: 'test', permissions: {}, sessionId: 's1', workspaceRoot: testDir };
 
 before(() => {
-  if (!existsSync(testDir)) mkdirSync(testDir, { recursive: true });
+  if (!existsSync(testDir)) {mkdirSync(testDir, { recursive: true });}
   writeFileSync(testFile, 'line1\nline2\nline3\nline4\nline5\n', 'utf-8');
 });
 

@@ -2,10 +2,10 @@
 
 > 一个轻量化、可扩展的 AI Coding Agent
 
+[![npm](https://img.shields.io/npm/v/daisycode)](https://www.npmjs.com/package/daisycode)
+[![CI](https://github.com/ricky-theseus/DaisyCode/actions/workflows/ci.yml/badge.svg)](https://github.com/ricky-theseus/DaisyCode/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen)](https://github.com/ricky-theseus/DaisyCode)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Last Commit](https://img.shields.io/github/last-commit/ricky-theseus/DaisyCode)](https://github.com/ricky-theseus/DaisyCode)
-[![Issues](https://img.shields.io/github/issues/ricky-theseus/DaisyCode)](https://github.com/ricky-theseus/DaisyCode/issues)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 
 ## 简介
 

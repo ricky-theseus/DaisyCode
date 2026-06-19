@@ -4,13 +4,13 @@ import { mkdirSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { SkillsLoader } from '../src/skills/loader.js';
 import { SkillsMatcher } from '../src/skills/matcher.js';
-import type { Skill } from '../src/types.js';
+
 
 const testDir = join(import.meta.dirname, '.test-skills');
 const skillsDir = join(testDir, '.opencode', 'skills');
 
 before(() => {
-  if (!existsSync(skillsDir)) mkdirSync(skillsDir, { recursive: true });
+  if (!existsSync(skillsDir)) {mkdirSync(skillsDir, { recursive: true });}
 });
 
 after(() => {

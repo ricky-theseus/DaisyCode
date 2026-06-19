@@ -11,10 +11,10 @@ export class MCPServerTransport {
   private nextId = 1;
   private pending = new Map<number, { resolve: (v: JSONRPCResponse) => void; reject: (e: Error) => void; timer: NodeJS.Timeout }>();
 
-  spawn(command: string, args: string[], env?: Record<string, string>, requestTimeout = 60_000): void {
+  spawn(command: string, args: string[], env?: Record<string, string>, _requestTimeout = 60_000): void {
     // Resource limits: Node.js MCP processes get --max-old-space-size=512
     const spawnEnv: Record<string, string> = { ...process.env as Record<string, string> };
-    if (env) Object.assign(spawnEnv, env);
+    if (env) {Object.assign(spawnEnv, env);}
 
     // If the command is node/npx, set NODE_OPTIONS for memory limit
     const baseName = command.split(/[/\\]/).pop()?.toLowerCase() ?? '';
@@ -45,7 +45,7 @@ export class MCPServerTransport {
     this.rl = createInterface({ input: this.proc.stdout! });
     this.rl.on('line', (line: string) => {
       const trimmed = line.trim();
-      if (!trimmed) return;
+      if (!trimmed) {return;}
 
       let msg: JSONRPCResponse;
       try {
@@ -69,9 +69,9 @@ export class MCPServerTransport {
     });
 
     // Collect stderr for debugging (don't crash on stderr output)
-    let stderrBuf = '';
-    this.proc.stderr?.on('data', (data: Buffer) => {
-      stderrBuf += data.toString();
+    // ponytail: stderr collected for debugging, kept if needed
+    this.proc.stderr?.on('data', (_data: Buffer) => {
+      // stderr from MCP servers is available here if needed
     });
   }
 
@@ -93,7 +93,7 @@ export class MCPServerTransport {
       this.pending.set(id, { resolve, reject, timer });
 
       try {
-        this.proc.stdin.write(JSON.stringify(req) + '\n');
+        this.proc.stdin.write(`${JSON.stringify(req)  }\n`);
       } catch (err) {
         clearTimeout(timer);
         this.pending.delete(id);

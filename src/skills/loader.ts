@@ -33,7 +33,7 @@ export class SkillsLoader {
     skillsConfig: Record<string, Skill> | undefined,
     projectDir: string,
   ): Record<string, Skill> {
-    if (this.cache) return this.cache;
+    if (this.cache) {return this.cache;}
 
     const result: Record<string, Skill> = {};
 
@@ -115,11 +115,11 @@ export class SkillsLoader {
 
     // 2. .opencode/skills/<name>.md
     const projectSkill = join(projectDir, '.opencode', 'skills', `${name}.md`);
-    if (existsSync(projectSkill)) return projectSkill;
+    if (existsSync(projectSkill)) {return projectSkill;}
 
     // 3. ~/.config/opencode/skills/<name>.md
     const userSkill = join(homedir(), '.config', 'opencode', 'skills', `${name}.md`);
-    if (existsSync(userSkill)) return userSkill;
+    if (existsSync(userSkill)) {return userSkill;}
 
     return null;
   }
@@ -153,7 +153,7 @@ export class SkillsLoader {
 
     // 解析 YAML front-matter（手写解析，零依赖）
     const parsed = this.parseYamlFrontMatter(frontMatter);
-    if (!parsed) return null;
+    if (!parsed) {return null;}
 
     return {
       trigger: parsed.trigger,
@@ -173,7 +173,7 @@ export class SkillsLoader {
 
     for (const line of lines) {
       const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('#')) continue;
+      if (!trimmed || trimmed.startsWith('#')) {continue;}
 
       // trigger: ["react", "nextjs"] 或 trigger: ["react"]
       const triggerMatch = trimmed.match(/^trigger:\s*\[(.*)\]$/);

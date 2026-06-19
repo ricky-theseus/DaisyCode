@@ -21,7 +21,7 @@ export class SkillsMatcher {
    * 顺序保持 skills 配置的插入顺序
    */
   match(input: string): Skill[] {
-    if (!input || Object.keys(this.skills).length === 0) return [];
+    if (!input || Object.keys(this.skills).length === 0) {return [];}
 
     const matched: Skill[] = [];
 
@@ -43,7 +43,7 @@ export class SkillsMatcher {
    *   ---
    */
   buildSkillPrompt(matched: Skill[]): string {
-    if (matched.length === 0) return '';
+    if (matched.length === 0) {return '';}
 
     const parts = matched.map(skill => {
       const prompt = skill.prompt ?? '';
@@ -55,13 +55,13 @@ export class SkillsMatcher {
 
   private matches(input: string, skill: Skill): boolean {
     const triggers = skill.trigger;
-    if (!triggers || triggers.length === 0) return false;
+    if (!triggers || triggers.length === 0) {return false;}
 
     for (const keyword of triggers) {
       // 词边界匹配，避免 "reactor" 匹配 "react"
       const escaped = this.escapeRegex(keyword);
       const re = new RegExp(`\\b${escaped}\\b`, 'i');
-      if (re.test(input)) return true;
+      if (re.test(input)) {return true;}
     }
 
     return false;

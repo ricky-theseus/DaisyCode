@@ -3,13 +3,13 @@ import { resolve } from 'node:path';
 import type { Tool } from './types.js';
 
 function isPathTraversal(requested: string, workspaceRoot: string | undefined): boolean {
-  if (!workspaceRoot) return false;
+  if (!workspaceRoot) {return false;}
   const resolved = resolve(workspaceRoot, requested);
   return !resolved.startsWith(resolve(workspaceRoot));
 }
 
 function resolvePath(rawPath: string, workspaceRoot: string | undefined): string {
-  if (isPathTraversal(rawPath, workspaceRoot)) return rawPath;
+  if (isPathTraversal(rawPath, workspaceRoot)) {return rawPath;}
   return workspaceRoot ? resolve(workspaceRoot, rawPath) : rawPath;
 }
 

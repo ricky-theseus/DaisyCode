@@ -54,8 +54,8 @@ interface OpenAICompatibleStreamChunk {
 function toMessages(msgs: Message[]): OpenAICompatibleMessage[] {
   return msgs.map(m => {
     const msg: OpenAICompatibleMessage = { role: m.role, content: m.content };
-    if (m.tool_calls) msg.tool_calls = m.tool_calls;
-    if (m.tool_call_id) msg.tool_call_id = m.tool_call_id;
+    if (m.tool_calls) {msg.tool_calls = m.tool_calls;}
+    if (m.tool_call_id) {msg.tool_call_id = m.tool_call_id;}
     return msg;
   });
 }
@@ -80,7 +80,7 @@ function buildToolsBody(tools: ChatRequest['tools']) {
 }
 
 export function estimateTokens(text: string, usageTotal?: number): number {
-  if (usageTotal !== undefined && usageTotal > 0) return usageTotal;
+  if (usageTotal !== undefined && usageTotal > 0) {return usageTotal;}
   return Math.ceil(text.length / 3.5);
 }
 
@@ -105,14 +105,14 @@ class HttpClient {
   async *postStream<T>(path: string, body: unknown, signal?: AbortSignal): AsyncIterable<T> {
     const response = await this.postRaw(path, { ...(body as object), stream: true }, signal);
     const reader = response.body?.getReader();
-    if (!reader) throw new Error('No response body');
+    if (!reader) {throw new Error('No response body');}
 
     const decoder = new TextDecoder();
     let buffer = '';
 
     while (true) {
       const { done, value } = await reader.read();
-      if (done) break;
+      if (done) {break;}
 
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split('\n');
@@ -120,9 +120,9 @@ class HttpClient {
 
       for (const line of lines) {
         const trimmed = line.trim();
-        if (!trimmed || !trimmed.startsWith('data: ')) continue;
+        if (!trimmed || !trimmed.startsWith('data: ')) {continue;}
         const payload = trimmed.slice(6);
-        if (payload === '[DONE]') return;
+        if (payload === '[DONE]') {return;}
 
         try {
           yield JSON.parse(payload) as T;
@@ -155,7 +155,7 @@ class HttpClient {
           signal: controller.signal,
         });
 
-        if (response.ok) return response;
+        if (response.ok) {return response;}
 
         if (response.status === 429) {
           const delay = Math.min(1000 * Math.pow(2, attempt), 8000);
@@ -173,7 +173,7 @@ class HttpClient {
         throw new Error(`API error ${response.status}: ${text}`);
       } catch (err) {
         lastError = err instanceof Error ? err : new Error(String(err));
-        if (lastError.name === 'AbortError') throw lastError;
+        if (lastError.name === 'AbortError') {throw lastError;}
         if (attempt < 4) {
           const delay = Math.min(1000 * Math.pow(2, attempt), 8000);
           await new Promise(r => setTimeout(r, delay));
@@ -235,7 +235,7 @@ export class DeepSeekAdapter implements ModelAdapter {
 
   protected *chunkToEvents(chunk: OpenAICompatibleStreamChunk): Iterable<ChatChunk> {
     const choice = chunk.choices?.[0];
-    if (!choice) return;
+    if (!choice) {return;}
 
     if (choice.delta.content) {
       yield { type: 'text', content: choice.delta.content, index: choice.index };
@@ -416,7 +416,7 @@ export class AnthropicAdapter implements ModelAdapter {
         function: { name: c.name, arguments: JSON.stringify(c.input) },
       }));
 
-    if (toolCalls.length > 0) message.tool_calls = toolCalls;
+    if (toolCalls.length > 0) {message.tool_calls = toolCalls;}
 
     return {
       message,
@@ -474,9 +474,9 @@ export interface ModelFactoryOptions {
  * 6. Default → deepseek
  */
 export function detectProvider(): ProviderName {
-  if (process.env.DEEPSEEK_API_KEY) return 'deepseek';
-  if (process.env.ANTHROPIC_API_KEY) return 'anthropic';
-  if (process.env.OPENAI_API_KEY) return 'openai';
+  if (process.env.DEEPSEEK_API_KEY) {return 'deepseek';}
+  if (process.env.ANTHROPIC_API_KEY) {return 'anthropic';}
+  if (process.env.OPENAI_API_KEY) {return 'openai';}
   return 'deepseek';
 }
 

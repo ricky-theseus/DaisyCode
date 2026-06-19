@@ -28,7 +28,7 @@ function deepMerge(target: unknown, source: unknown): unknown {
   if (isPlainObject(target) && isPlainObject(source)) {
     const result: Record<string, unknown> = { ...target };
     for (const key of Object.keys(source)) {
-      if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue;
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') {continue;}
       result[key] = deepMerge(target[key], source[key]);
     }
     return result;
@@ -51,8 +51,7 @@ function loadYaml(path: string): Record<string, unknown> | null {
   try {
     const raw = readFileSync(path, 'utf-8');
     // Dynamic import — js-yaml is an optional dependency
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const yaml = require('js-yaml') as typeof import('js-yaml');
+    const yaml = require('js-yaml');
     return yaml.load(raw) as Record<string, unknown> | null;
   } catch {
     return null;
@@ -60,9 +59,9 @@ function loadYaml(path: string): Record<string, unknown> | null {
 }
 
 function loadConfigFile(path: string): Record<string, unknown> | null {
-  if (!existsSync(path)) return null;
-  if (path.endsWith('.jsonc') || path.endsWith('.json')) return loadJsonc(path);
-  if (path.endsWith('.yaml') || path.endsWith('.yml')) return loadYaml(path);
+  if (!existsSync(path)) {return null;}
+  if (path.endsWith('.jsonc') || path.endsWith('.json')) {return loadJsonc(path);}
+  if (path.endsWith('.yaml') || path.endsWith('.yml')) {return loadYaml(path);}
   return null;
 }
 

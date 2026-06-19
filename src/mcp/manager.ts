@@ -1,6 +1,7 @@
 import type { MCPProcessState, MCPConfig } from './types.js';
 import type { ToolDef, ToolContext } from '../types.js';
-import { ToolRegistry, type Tool } from '../tools/types.js';
+import type { ToolRegistry} from '../tools/types.js';
+import { type Tool } from '../tools/types.js';
 import { MCPClient } from './client.js';
 
 interface ManagedServer {
@@ -22,10 +23,10 @@ export class MCPManager {
   }
 
   async loadFromConfig(mcpConfigs?: Record<string, MCPConfig>): Promise<void> {
-    if (!mcpConfigs) return;
+    if (!mcpConfigs) {return;}
 
     const entries = Object.entries(mcpConfigs);
-    if (entries.length === 0) return;
+    if (entries.length === 0) {return;}
 
     await Promise.all(entries.map(([name, config]) => this.registerServer(name, config)));
   }
@@ -55,7 +56,7 @@ export class MCPManager {
     try {
       await client.initialize();
       this.registerTools(name, client);
-    } catch (err) {
+    } catch {
       // Initial startup failed — attempt restart
       await this.attemptRestart(name);
     }
@@ -63,7 +64,7 @@ export class MCPManager {
 
   private async attemptRestart(name: string): Promise<void> {
     const managed = this.servers.get(name);
-    if (!managed) return;
+    if (!managed) {return;}
 
     managed.restartCount++;
     if (managed.restartCount > managed.maxRestarts) {
@@ -95,7 +96,7 @@ export class MCPManager {
 
   private handleError(name: string): void {
     const managed = this.servers.get(name);
-    if (!managed) return;
+    if (!managed) {return;}
 
     // Attempt restart in background
     this.attemptRestart(name).catch(() => {
@@ -106,7 +107,7 @@ export class MCPManager {
 
   private markFatal(name: string): void {
     const managed = this.servers.get(name);
-    if (!managed) return;
+    if (!managed) {return;}
 
     managed.client.state = 'fatal';
     managed.client.close();
@@ -137,7 +138,7 @@ export class MCPManager {
   getTools(): ToolDef[] {
     const tools: ToolDef[] = [];
     for (const [name, managed] of this.servers) {
-      if (managed.client.state === 'fatal') continue;
+      if (managed.client.state === 'fatal') {continue;}
       for (const t of managed.client.tools) {
         tools.push({
           name: `mcp_${name}_${t.name}`,

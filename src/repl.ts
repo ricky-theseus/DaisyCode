@@ -1,16 +1,15 @@
 import * as readline from 'node:readline';
 import { stdin as input, stdout as output } from 'node:process';
-import type { AgentEvent } from './types.js';
 import type { Agent } from './agent-loop.js';
 
 function sanitizeOutput(text: string): string {
   // Filter ANSI escape sequences (keep \n \t \r)
-  // eslint-disable-next-line no-control-regex
+   
   return text
     .replace(/\x00/g, '')           // NULL bytes
     .replace(/[\x01-\x08\x0B\x0C\x0E-\x1F]/g, '') // control chars except \n \t \r
     .split('\n')
-    .map(line => line.length > 1000 ? line.slice(0, 1000) + '...[truncated]' : line)
+    .map(line => line.length > 1000 ? `${line.slice(0, 1000)  }...[truncated]` : line)
     .join('\n');
 }
 
@@ -33,7 +32,7 @@ export async function startRepl(agent: Agent, agentName: string): Promise<void> 
   prompt();
 
   const processInput = async (input: string) => {
-    if (running) return;
+    if (running) {return;}
     running = true;
     abortController = new AbortController();
 
@@ -73,7 +72,7 @@ export async function startRepl(agent: Agent, agentName: string): Promise<void> 
 
   // Handle line input
   rl.on('line', (line) => {
-    if (running) return;
+    if (running) {return;}
 
     const trimmed = line.trimEnd();
 
@@ -85,7 +84,7 @@ export async function startRepl(agent: Agent, agentName: string): Promise<void> 
         currentInput = '';
         processInput(input);
       } else {
-        currentInput += '\n' + trimmed;
+        currentInput += `\n${  trimmed}`;
         prompt();
       }
       return;

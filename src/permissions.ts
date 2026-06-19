@@ -16,7 +16,7 @@ export function mergePermissions(
   child: AgentPermissions | undefined,
 ): AgentPermissions {
   const result: AgentPermissions = { ...parent };
-  if (!child) return result;
+  if (!child) {return result;}
 
   for (const key of Object.keys(child)) {
     if (key in parent) {

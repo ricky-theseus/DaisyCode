@@ -5,7 +5,7 @@ import type { SessionConfig, Message } from './types.js';
 
 export type ExportFormat = 'markdown';
 
-export function createSession(agent: string, dir: string): SessionConfig {
+export function createSession(agent: string, _dir: string): SessionConfig {
   const now = new Date().toISOString();
   return {
     id: randomUUID(),
@@ -30,7 +30,7 @@ export function saveSession(session: SessionConfig, dir: string): void {
 
 export function loadSession(id: string, dir: string): SessionConfig | null {
   const path = join(dir, `${id}.json`);
-  if (!existsSync(path)) return null;
+  if (!existsSync(path)) {return null;}
 
   try {
     const raw = readFileSync(path, 'utf-8');
@@ -62,7 +62,7 @@ function formatMessage(msg: Message): string {
     const calls = msg.tool_calls.map(tc =>
       `  - ${tc.function.name}(${tc.function.arguments})`
     ).join('\n');
-    content += '\n' + calls;
+    content += `\n${  calls}`;
   }
 
   if (msg.tool_call_id) {

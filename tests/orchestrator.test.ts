@@ -1,4 +1,4 @@
-import { describe, it, before, after } from 'node:test';
+import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { Orchestrator, acquireFileLock, releaseFileLock, releaseSessionLocks } from '../src/orchestrator.js';
 import { ToolRegistry } from '../src/tools/types.js';
@@ -26,7 +26,7 @@ function makeOrchestrator(): Orchestrator {
 describe('Orchestrator — createSubagent', () => {
   it('creates a subagent session with depth 0 when parentId is null', () => {
     const orch = makeOrchestrator();
-    const { session, permissions } = orch.createSubagent(
+    const { session } = orch.createSubagent(
       { agent: 'test-agent' },
       null,
       {},

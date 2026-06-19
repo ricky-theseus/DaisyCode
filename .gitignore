@@ -5,6 +5,9 @@ node_modules/
 dist/
 .cache/
 
+# Coverage
+coverage/
+
 # Environment
 .env
 .env.*

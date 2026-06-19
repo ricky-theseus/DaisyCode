@@ -5,7 +5,7 @@ import type { Tool } from './types.js';
 const DEFAULT_MAX_BYTES = 1_048_576; // 1MB
 
 function isPathTraversal(requested: string, workspaceRoot: string | undefined): boolean {
-  if (!workspaceRoot) return false;
+  if (!workspaceRoot) {return false;}
   const resolved = resolve(workspaceRoot, requested);
   return !resolved.startsWith(resolve(workspaceRoot));
 }

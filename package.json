@@ -26,11 +26,19 @@
     "dev": "tsx src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "node --import tsx --test tests/**/*.test.ts"
+    "test": "node --import tsx --test tests/**/*.test.ts",
+    "lint": "eslint src/ tests/",
+    "format": "prettier --write src/ tests/",
+    "coverage": "c8 --reporter=text --reporter=lcov node --import tsx --test tests/**/*.test.ts"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.0",
+    "@typescript-eslint/eslint-plugin": "^8.0",
+    "@typescript-eslint/parser": "^8.0",
+    "c8": "^10.1",
+    "eslint": "^9.0",
+    "prettier": "^3.4",
     "tsx": "^4.0",
     "typescript": "^5.5"
   },

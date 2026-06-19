@@ -2,7 +2,8 @@ import { randomUUID } from 'node:crypto';
 import type { AgentPermissions, AgentEvent } from './types.js';
 import type { ModelAdapter } from './model-adapter.js';
 import type { ToolRegistry } from './tools/types.js';
-import { PermissionSystem, mergePermissions } from './permissions.js';
+import type { PermissionSystem} from './permissions.js';
+import { mergePermissions } from './permissions.js';
 import { Agent } from './agent-loop.js';
 
 const MAX_DEPTH = 3;
@@ -46,7 +47,7 @@ export function releaseFileLock(path: string): void {
 
 export function releaseSessionLocks(sessionId: string): void {
   for (const [path, sid] of fileLocks) {
-    if (sid === sessionId) fileLocks.delete(path);
+    if (sid === sessionId) {fileLocks.delete(path);}
   }
 }
 
@@ -142,7 +143,7 @@ export class Orchestrator {
       // background errors silently truncated
     }
     const truncated = output.length > BACKGROUND_TRUNCATE
-      ? output.slice(0, BACKGROUND_TRUNCATE) + '...[truncated]'
+      ? `${output.slice(0, BACKGROUND_TRUNCATE)  }...[truncated]`
       : output;
     session.messages.push({ type: 'text_delta' as const, content: `[background task complete]\n${truncated}` });
   }

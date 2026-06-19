@@ -1,8 +1,8 @@
 import type { AgentEvent, Message, ToolCall, ToolContext, AgentPermissions } from './types.js';
 import type { ModelAdapter } from './model-adapter.js';
-import { ToolRegistry } from './tools/types.js';
-import { PermissionSystem } from './permissions.js';
-import { SkillsMatcher } from './skills/matcher.js';
+import type { ToolRegistry } from './tools/types.js';
+import type { PermissionSystem } from './permissions.js';
+import type { SkillsMatcher } from './skills/matcher.js';
 
 export interface AgentOptions {
   model: ModelAdapter;
@@ -48,7 +48,7 @@ export class Agent {
 
   async *run(input: string, options?: { signal?: AbortSignal }): AsyncIterable<AgentEvent> {
     // Empty input — silent return
-    if (!input || input.trim() === '') return;
+    if (!input || input.trim() === '') {return;}
 
     const signal = options?.signal;
 
@@ -70,7 +70,7 @@ export class Agent {
     const tools = this.registry.list();
 
     for (let iteration = 0; iteration < this.maxIterations; iteration++) {
-      if (signal?.aborted) throw new AgentAbortedError();
+      if (signal?.aborted) {throw new AgentAbortedError();}
 
       // Context window management: truncate if too long
       this.truncateMessages(messages);
@@ -113,7 +113,7 @@ export class Agent {
 
       // Execute each tool call
       for (const tc of toolCalls) {
-        if (signal?.aborted) throw new AgentAbortedError();
+        if (signal?.aborted) {throw new AgentAbortedError();}
 
         let args: Record<string, unknown>;
         try {
@@ -207,7 +207,7 @@ export class Agent {
     const maxTokens = 128_000;
     const total = messages.reduce((sum, m) => sum + m.content.length, 0);
 
-    if (total <= maxTokens * 0.8 * 3.5) return;
+    if (total <= maxTokens * 0.8 * 3.5) {return;}
 
     // Keep system message (index 0), drop oldest user+assistant pairs
     while (messages.length > 3) {
@@ -224,9 +224,9 @@ export class Agent {
       messages.push(...kept);
 
       const newTotal = messages.reduce((sum, m) => sum + m.content.length, 0);
-      if (newTotal <= maxTokens * 0.8 * 3.5) break;
+      if (newTotal <= maxTokens * 0.8 * 3.5) {break;}
       // If still over, drop one more pair
-      if (messages.length <= 2) break;
+      if (messages.length <= 2) {break;}
       messages.splice(1, 2);
     }
   }

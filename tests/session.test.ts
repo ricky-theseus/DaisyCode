@@ -4,12 +4,11 @@ import { randomUUID } from 'node:crypto';
 import { mkdirSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { createSession, saveSession, loadSession, addMessage } from '../src/session.js';
-import type { SessionConfig } from '../src/types.js';
 
 const testDir = join(import.meta.dirname, '.test-sessions');
 
 before(() => {
-  if (!existsSync(testDir)) mkdirSync(testDir, { recursive: true });
+  if (!existsSync(testDir)) {mkdirSync(testDir, { recursive: true });}
 });
 
 after(() => {

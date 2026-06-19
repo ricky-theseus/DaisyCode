@@ -44,7 +44,7 @@ export async function initProject(cwd: string): Promise<void> {
         },
       },
     };
-    writeFileSync(daisyPath, JSON.stringify(config, null, 2) + '\n', 'utf-8');
+    writeFileSync(daisyPath, `${JSON.stringify(config, null, 2)  }\n`, 'utf-8');
     console.log(`  Created daisy.jsonc`);
   }
 

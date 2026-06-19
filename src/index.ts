@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import { parseArgs } from 'node:util';
-import { existsSync } from 'node:fs';
 import { loadConfig, ensureSessionDir } from './config.js';
 import { createDefaultRegistry } from './tools/registry.js';
 import { createTaskTool } from './tools/task.js';

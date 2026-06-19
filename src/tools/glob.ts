@@ -28,8 +28,8 @@ function walk(dir: string, baseDir: string, pattern: string, results: string[]):
     try {
       const stat = statSync(fullPath);
       if (stat.isDirectory()) {
-        if (matchGlob(pattern, relPath + '/')) {
-          results.push(relPath + '/');
+        if (matchGlob(pattern, `${relPath  }/`)) {
+          results.push(`${relPath  }/`);
         }
         walk(fullPath, baseDir, pattern, results);
       } else {

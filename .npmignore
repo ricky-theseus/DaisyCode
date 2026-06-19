@@ -1,5 +1,7 @@
 src/
 tests/
+docs/
+coverage/
 .opencode/
 .daisy/
 tsconfig.json
