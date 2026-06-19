@@ -5,7 +5,7 @@ import { loadConfig, ensureSessionDir } from './config.js';
 import { createDefaultRegistry } from './tools/registry.js';
 import { createTaskTool } from './tools/task.js';
 import { PermissionSystem } from './permissions.js';
-import { createModel } from './model-adapter.js';
+import { createModel, detectProvider } from './model-adapter.js';
 import { Agent } from './agent-loop.js';
 import { Orchestrator } from './orchestrator.js';
 import { SkillsLoader } from './skills/loader.js';
@@ -14,6 +14,7 @@ import { createSession, loadSession, saveExportedSession } from './session.js';
 import { startRepl } from './repl.js';
 import { migrate } from './commands/migrate.js';
 import { initProject } from './commands/init.js';
+import { connectCommand, showOnboardingMenu } from './commands/connect.js';
 
 function showHelp(exitCode = 0): void {
   console.log(`DaisyCode — AI Coding Agent
@@ -22,6 +23,9 @@ Usage:
   daisy [command] [options]
 
 Commands:
+  connect              Configure AI provider (interactive)
+  connect list         List configured providers
+  connect remove <prov> Remove a provider
   migrate              Migrate opencode.json → daisy.jsonc
   init                 Initialize a new DaisyCode project
   export <sessionId>   Export a session to Markdown
@@ -35,7 +39,7 @@ Commands:
   process.exit(exitCode);
 }
 
-const VERSION = '1.0.4';
+const VERSION = '1.0.5';
 
 async function main() {
   const { values, positionals } = parseArgs({
@@ -62,6 +66,13 @@ async function main() {
   const command = positionals[0];
 
   // Subcommands
+  if (command === 'connect') {
+    const subcommand = positionals[1];
+    const args = positionals.slice(2);
+    await connectCommand(subcommand, args);
+    return;
+  }
+
   if (command === 'migrate') {
     migrate(cwd);
     return;
@@ -94,8 +105,22 @@ async function main() {
   const agentName = String(values.agent ?? config.default_agent ?? 'default');
   const agentConfig = config.agent?.[agentName];
 
+  // Check if we have a usable provider — if not, run onboarding
+  const provider = detectProvider();
+  if (provider === 'none') {
+    const configured = await showOnboardingMenu();
+    if (!configured) {
+      console.log('No provider configured. Exiting.');
+      process.exit(0);
+    }
+  }
+
   const permissions = new PermissionSystem();
   const model = createModel();
+  if (!model) {
+    console.error('No AI model available. Run `daisy connect` to configure one.');
+    process.exit(1);
+  }
   const registry = createDefaultRegistry();
   const orchestrator = new Orchestrator(model, registry, permissions);
   registry.register(createTaskTool(orchestrator));

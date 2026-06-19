@@ -1,4 +1,5 @@
 import type { ChatRequest, ChatResponse, ChatChunk, Message, ToolCall } from './types.js';
+import { loadAuth } from './auth.js';
 
 export interface ModelAdapter {
   chat(request: ChatRequest): Promise<ChatResponse>;
@@ -84,7 +85,7 @@ export function estimateTokens(text: string, usageTotal?: number): number {
   return Math.ceil(text.length / 3.5);
 }
 
-// ─── Base HTTP client (shared retry logic) ───────────────────────────────────
+// ─── Base HTTP client ────────────────────────────────────────────────────────
 
 class HttpClient {
   private baseURL: string;
@@ -189,19 +190,19 @@ class HttpClient {
   }
 }
 
-// ─── DeepSeek ────────────────────────────────────────────────────────────────
+// ─── OpenAI-compatible adapter (DeepSeek, OpenAI, Groq, Custom) ──────────────
 
-export class DeepSeekAdapter implements ModelAdapter {
-  private http: HttpClient;
-  private model: string;
+export class OpenAICompatibleAdapter implements ModelAdapter {
+  protected http: HttpClient;
+  protected model: string;
 
   constructor(opts?: { baseURL?: string; apiKey?: string; timeout?: number; model?: string }) {
     this.http = new HttpClient(
-      opts?.baseURL ?? 'https://api.deepseek.com/v1',
-      opts?.apiKey ?? process.env.DEEPSEEK_API_KEY ?? '',
+      opts?.baseURL ?? 'https://api.openai.com/v1',
+      opts?.apiKey ?? '',
       opts?.timeout ?? 120_000,
     );
-    this.model = opts?.model ?? 'deepseek-chat';
+    this.model = opts?.model ?? 'gpt-4o';
   }
 
   async chat(request: ChatRequest): Promise<ChatResponse> {
@@ -252,19 +253,6 @@ export class DeepSeekAdapter implements ModelAdapter {
         }
       }
     }
-  }
-}
-
-// ─── OpenAI ──────────────────────────────────────────────────────────────────
-
-export class OpenAIAdapter extends DeepSeekAdapter {
-  constructor(opts?: { baseURL?: string; apiKey?: string; timeout?: number; model?: string }) {
-    super({
-      baseURL: opts?.baseURL ?? 'https://api.openai.com/v1',
-      apiKey: opts?.apiKey ?? process.env.OPENAI_API_KEY ?? '',
-      timeout: opts?.timeout ?? 120_000,
-      model: opts?.model ?? 'gpt-4o',
-    });
   }
 }
 
@@ -320,7 +308,7 @@ export class AnthropicAdapter implements ModelAdapter {
   constructor(opts?: { baseURL?: string; apiKey?: string; timeout?: number; model?: string; maxTokens?: number }) {
     this.http = new HttpClient(
       opts?.baseURL ?? 'https://api.anthropic.com/v1',
-      opts?.apiKey ?? process.env.ANTHROPIC_API_KEY ?? '',
+      opts?.apiKey ?? '',
       opts?.timeout ?? 120_000,
     );
     this.model = opts?.model ?? 'claude-sonnet-4-20250514';
@@ -356,7 +344,6 @@ export class AnthropicAdapter implements ModelAdapter {
           tool_use_id: m.tool_call_id ?? '',
           content: m.content,
         };
-        // Merge into last user message or create one
         const last = msgs[msgs.length - 1];
         if (last && last.role === 'user') {
           last.content.push(content);
@@ -441,7 +428,6 @@ export class AnthropicAdapter implements ModelAdapter {
       };
     }
     if (event.type === 'content_block_delta' && event.delta?.type === 'input_json_delta' && event.delta?.partial_json) {
-      // Anthropic streams tool args as JSON deltas — we emit them as text for accumulation
       yield { type: 'text', content: event.delta.partial_json, index: event.index ?? 0 };
     }
   }
@@ -449,67 +435,81 @@ export class AnthropicAdapter implements ModelAdapter {
 
 // ─── Factory ─────────────────────────────────────────────────────────────────
 
-export type ProviderName = 'deepseek' | 'openai' | 'anthropic' | string;
+export type ProviderName = 'deepseek' | 'openai' | 'anthropic' | 'groq' | 'custom' | string;
 
 export interface ModelFactoryOptions {
-  /** Provider name: 'deepseek' | 'openai' | 'anthropic' | custom */
   provider?: ProviderName;
-  /** Custom base URL (for OpenAI-compatible APIs) */
   baseURL?: string;
-  /** API key override */
   apiKey?: string;
-  /** Model name override */
   model?: string;
-  /** Request timeout */
   timeout?: number;
 }
 
-/**
- * Auto-detect provider from environment variables:
- * 1. Explicit `provider` option wins
- * 2. `baseURL` + no provider → OpenAIAdapter (custom endpoint)
- * 3. DEEPSEEK_API_KEY → deepseek
- * 4. ANTHROPIC_API_KEY → anthropic
- * 5. OPENAI_API_KEY → openai
- * 6. Default → deepseek
- */
 export function detectProvider(): ProviderName {
-  if (process.env.DEEPSEEK_API_KEY) {return 'deepseek';}
-  if (process.env.ANTHROPIC_API_KEY) {return 'anthropic';}
-  if (process.env.OPENAI_API_KEY) {return 'openai';}
-  return 'deepseek';
+  if (process.env.GROQ_API_KEY) return 'groq';
+  if (process.env.DEEPSEEK_API_KEY) return 'deepseek';
+  if (process.env.ANTHROPIC_API_KEY) return 'anthropic';
+  if (process.env.OPENAI_API_KEY) return 'openai';
+
+  const auth = loadAuth();
+  if (auth?.defaultProvider && auth.providers[auth.defaultProvider]?.apiKey) {
+    return auth.defaultProvider;
+  }
+
+  return 'none';
 }
 
-export function createModel(opts?: ModelFactoryOptions): ModelAdapter {
+export function createModel(opts?: ModelFactoryOptions): ModelAdapter | null {
   const provider = opts?.provider ?? detectProvider();
+  const auth = loadAuth();
+  const providerConfig = auth?.providers?.[provider];
+
+  function resolveKey(envVar: string): string {
+    return opts?.apiKey ?? process.env[envVar] ?? providerConfig?.apiKey ?? '';
+  }
 
   switch (provider) {
-    case 'deepseek':
-      return new DeepSeekAdapter({
-        baseURL: opts?.baseURL,
-        apiKey: opts?.apiKey,
+    case 'groq':
+      return new OpenAICompatibleAdapter({
+        baseURL: opts?.baseURL ?? providerConfig?.baseURL ?? 'https://api.groq.com/openai/v1',
+        apiKey: resolveKey('GROQ_API_KEY'),
         timeout: opts?.timeout,
-        model: opts?.model,
+        model: opts?.model ?? auth?.defaultModel ?? 'llama-3.3-70b-versatile',
+      });
+    case 'deepseek':
+      return new OpenAICompatibleAdapter({
+        baseURL: opts?.baseURL ?? providerConfig?.baseURL ?? 'https://api.deepseek.com/v1',
+        apiKey: resolveKey('DEEPSEEK_API_KEY'),
+        timeout: opts?.timeout,
+        model: opts?.model ?? auth?.defaultModel ?? 'deepseek-chat',
       });
     case 'openai':
-      return new OpenAIAdapter({
-        baseURL: opts?.baseURL,
-        apiKey: opts?.apiKey,
+      return new OpenAICompatibleAdapter({
+        baseURL: opts?.baseURL ?? providerConfig?.baseURL ?? 'https://api.openai.com/v1',
+        apiKey: resolveKey('OPENAI_API_KEY'),
         timeout: opts?.timeout,
-        model: opts?.model,
+        model: opts?.model ?? auth?.defaultModel ?? 'gpt-4o',
       });
     case 'anthropic':
       return new AnthropicAdapter({
-        baseURL: opts?.baseURL,
-        apiKey: opts?.apiKey,
+        baseURL: opts?.baseURL ?? providerConfig?.baseURL ?? 'https://api.anthropic.com/v1',
+        apiKey: resolveKey('ANTHROPIC_API_KEY'),
         timeout: opts?.timeout,
-        model: opts?.model,
+        model: opts?.model ?? auth?.defaultModel ?? 'claude-sonnet-4-20250514',
       });
+    case 'custom':
+      return new OpenAICompatibleAdapter({
+        baseURL: opts?.baseURL ?? providerConfig?.baseURL,
+        apiKey: resolveKey(''),
+        timeout: opts?.timeout,
+        model: opts?.model ?? providerConfig?.baseURL ? 'custom-model' : undefined,
+      });
+    case 'none':
+      return null;
     default:
-      // Custom provider — use OpenAI-compatible adapter
-      return new OpenAIAdapter({
-        baseURL: opts?.baseURL,
-        apiKey: opts?.apiKey,
+      return new OpenAICompatibleAdapter({
+        baseURL: opts?.baseURL ?? providerConfig?.baseURL,
+        apiKey: resolveKey(''),
         timeout: opts?.timeout,
         model: opts?.model ?? provider,
       });

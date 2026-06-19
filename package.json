@@ -1,7 +1,7 @@
 {
   "name": "daisycode",
-  "version": "1.0.4",
-  "description": "AI Coding Agent runtime â€” lightweight, extensible, MCP-powered",
+  "version": "1.0.5",
+  "description": "AI Coding Agent runtime â€?lightweight, extensible, MCP-powered",
   "type": "module",
   "bin": {
     "daisy": "dist/index.js"

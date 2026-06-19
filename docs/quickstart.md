@@ -17,22 +17,36 @@ daisy --version
 
 > Node.js 版本要求 >= 20。用 `node --version` 检查。
 
-## 2. 设置 API Key
+## 2. 首次启动
 
-至少配一个模型：
+直接运行 `daisy`，会自动进入配置向导：
 
 ```bash
-# DeepSeek（推荐，便宜又快）
-export DEEPSEEK_API_KEY=sk-你的key
-
-# 或者 OpenAI
-export OPENAI_API_KEY=sk-你的key
-
-# 或者 Anthropic
-export ANTHROPIC_API_KEY=sk-ant-你的key
+daisy
 ```
 
-> 建议把 `export` 加到 `~/.bashrc` 或 `~/.zshrc` 里，不用每次敲。
+你会看到交互菜单，选一个免费模型就能开始：
+
+```
+  🌼 DaisyCode — 首次启动
+
+  还没找到 AI 模型配置，选一个方式开始：
+
+   1) ☁️ Groq (free·recommended)    — Llama 3.3 70B, fast inference
+   2) 🌥️ Cloudflare Workers AI (free)  — Llama 3.2, DeepSeek R1
+   3) 🏠 Ollama (local)             — auto-detect if running
+   4) 🇨🇳 DeepSeek                    — paid, China-friendly
+   5) 🤖 OpenAI                      — paid, GPT series
+   6) 🧠 Anthropic                   — paid, Claude series
+   7) ⚙️ Custom (OpenAI-compatible)   — any baseURL
+   8) 🎮 Demo mode                   — no AI, just testing
+
+  Choice [1]:
+```
+
+**推荐选 1 (Groq)** — 免费、无需绑定信用卡、极速推理。
+
+按提示输入 API Key 后，DaisyCode 自动启动。
 
 ## 3. 初始化项目
 
