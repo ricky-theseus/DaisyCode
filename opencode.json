@@ -2,6 +2,9 @@
   "$schema": "https://opencode.ai/config.json",
   "default_agent": "tech-lead",
   "model": "deepseek/deepseek-chat",
+  "experimental": {
+    "background_subagents": true
+  },
   "plugin": [
     "oh-my-opencode",
     "opencode-skills-collection",
