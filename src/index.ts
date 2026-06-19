@@ -27,18 +27,22 @@ Commands:
   export <sessionId>   Export a session to Markdown
   (no command)         Start interactive REPL
 
-Options:
-  -a, --agent <name>   Agent to use (default: "default")
-  -d, --dir <path>     Project directory (default: cwd)
-  -h, --help           Show this help`);
+  Options:
+   -a, --agent <name>   Agent to use (default: "default")
+   -d, --dir <path>     Project directory (default: cwd)
+   -v, --version        Show version number
+   -h, --help           Show this help`);
   process.exit(exitCode);
 }
+
+const VERSION = '1.0.3';
 
 async function main() {
   const { values, positionals } = parseArgs({
     options: {
       agent: { type: 'string', short: 'a', default: 'default' },
       dir: { type: 'string', short: 'd' },
+      version: { type: 'boolean', short: 'v' },
       help: { type: 'boolean', short: 'h' },
     },
     allowPositionals: true,
@@ -47,6 +51,11 @@ async function main() {
 
   if (values.help) {
     showHelp(0);
+  }
+
+  if (values.version) {
+    console.log(VERSION);
+    process.exit(0);
   }
 
   const cwd = values.dir ? String(values.dir) : process.cwd();
