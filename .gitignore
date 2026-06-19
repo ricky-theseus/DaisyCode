@@ -19,6 +19,9 @@ Thumbs.db
 .idea/
 *.swp
 
+# Sessions
+.daisy/sessions/
+
 # Logs
 *.log
 logs/
