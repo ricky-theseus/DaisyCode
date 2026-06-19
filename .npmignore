@@ -1,0 +1,11 @@
+src/
+tests/
+.opencode/
+.daisy/
+tsconfig.json
+AGENTS.md
+CHANGELOG.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+SECURITY.md
+opencode.json

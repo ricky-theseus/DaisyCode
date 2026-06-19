@@ -6,7 +6,7 @@ import { loadConfig, ensureSessionDir } from './config.js';
 import { createDefaultRegistry } from './tools/registry.js';
 import { createTaskTool } from './tools/task.js';
 import { PermissionSystem } from './permissions.js';
-import { DeepSeekAdapter } from './model-adapter.js';
+import { createModel } from './model-adapter.js';
 import { Agent } from './agent-loop.js';
 import { Orchestrator } from './orchestrator.js';
 import { SkillsLoader } from './skills/loader.js';
@@ -87,7 +87,7 @@ async function main() {
   const agentConfig = config.agent?.[agentName];
 
   const permissions = new PermissionSystem();
-  const model = new DeepSeekAdapter();
+  const model = createModel();
   const registry = createDefaultRegistry();
   const orchestrator = new Orchestrator(model, registry, permissions);
   registry.register(createTaskTool(orchestrator));

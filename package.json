@@ -1,10 +1,26 @@
 {
   "name": "daisycode",
-  "version": "0.1.0",
-  "description": "AI Coding Agent runtime",
+  "version": "1.0.0",
+  "description": "AI Coding Agent runtime — lightweight, extensible, MCP-powered",
   "type": "module",
   "bin": {
-    "daisy": "src/index.ts"
+    "daisy": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "ai",
+    "coding-agent",
+    "cli",
+    "agent",
+    "mcp"
+  ],
+  "repository": "github:ricky-theseus/DaisyCode",
+  "engines": {
+    "node": ">=20"
   },
   "scripts": {
     "dev": "tsx src/index.ts",
