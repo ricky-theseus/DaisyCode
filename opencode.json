@@ -1,51 +1,12 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "default_agent": "tech-lead",
-  "model": "deepseek/deepseek-chat",
-  "lsp": true,
-  "experimental": {
-    "background_subagents": true
-  },
-  "plugin": [
-    "oh-my-opencode",
-    "opencode-skills-collection",
-    "opencode-supermemory",
-    "opencode-pty",
-    "opencode-worktree",
-    "opencode-notify",
-    "opencode-websearch-cited"
-  ],
-  "mcp": {
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp"]
-    },
-    "firecrawl": {
-      "command": "npx",
-      "args": ["-y", "firecrawl-mcp"]
-    },
-    "postgres": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres"]
-    },
-    "context7": {
-      "type": "remote",
-      "url": "https://mcp.context7.com/mcp"
-    },
-    "composio": {
-      "type": "remote",
-      "url": "https://connect.composio.dev/mcp"
-    }
-  },
+  "model": "deepseek/deepseek-v4-pro",
+  "plugin": [],
   "agent": {
     "tech-lead": {
       "description": "DaisyCode 技术主管，你的专属技术管家。听懂你的需求、拆解任务、管理团队、汇报进度",
       "mode": "primary",
-      "model": "deepseek/deepseek-chat",
       "color": "#2563eb",
       "temperature": 0.3,
       "permission": {
@@ -66,7 +27,7 @@
     "architect": {
       "description": "系统架构师，负责系统设计、技术选型、架构决策",
       "mode": "subagent",
-      "model": "deepseek/deepseek-reasoner",
+      "model": "deepseek/deepseek-v4-pro",
       "color": "#7c3aed",
       "temperature": 0.2,
       "permission": {
@@ -84,7 +45,7 @@
     "builder": {
       "description": "工程师，负责功能实现和编码",
       "mode": "subagent",
-      "model": "deepseek/deepseek-chat",
+      "model": "deepseek/deepseek-v4-flash",
       "color": "#059669",
       "temperature": 0.3,
       "permission": {
@@ -101,7 +62,7 @@
     "reviewer": {
       "description": "代码审查官，负责 Code Review、安全审计和质量把关",
       "mode": "subagent",
-      "model": "deepseek/deepseek-chat",
+      "model": "deepseek/deepseek-v4-pro",
       "color": "#dc2626",
       "temperature": 0.1,
       "permission": {
@@ -117,7 +78,7 @@
     "tester": {
       "description": "测试工程师，负责编写和执行测试",
       "mode": "subagent",
-      "model": "opencode/zen-free",
+      "model": "deepseek/deepseek-v4-flash",
       "color": "#d97706",
       "temperature": 0.2,
       "permission": {
@@ -133,7 +94,7 @@
     "documenter": {
       "description": "技术文档工程师，负责项目文档编写和维护",
       "mode": "subagent",
-      "model": "opencode/zen-free",
+      "model": "deepseek/deepseek-v4-flash",
       "color": "#0891b2",
       "temperature": 0.4,
       "permission": {
@@ -149,7 +110,7 @@
     "devops": {
       "description": "DevOps 工程师，负责构建、CI/CD、部署和基础设施",
       "mode": "subagent",
-      "model": "deepseek/deepseek-chat",
+      "model": "deepseek/deepseek-v4-flash",
       "color": "#0d9488",
       "temperature": 0.2,
       "permission": {
