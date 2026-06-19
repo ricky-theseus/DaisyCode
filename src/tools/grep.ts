@@ -51,10 +51,21 @@ export const grepTool: Tool = {
   },
   async execute(args) {
     const pattern = String(args.pattern ?? '');
+    if (pattern.length > 200) {
+      return { error: 'pattern_too_long', maxLength: 200 };
+    }
     const cwd = args.path ? String(args.path) : process.cwd();
     const include = args.include ? String(args.include) : '**/*';
+    if (include.length > 200) {
+      return { error: 'include_pattern_too_long', maxLength: 200 };
+    }
 
-    const regex = new RegExp(pattern, 'g');
+    let regex: RegExp;
+    try {
+      regex = new RegExp(pattern, 'g');
+    } catch {
+      return { error: 'invalid_regex', pattern };
+    }
     const matches: { file: string; line: number; content: string }[] = [];
 
     const files: string[] = [];

@@ -119,6 +119,7 @@ export class Agent {
           permissions: this.agentPermissions,
           signal,
           sessionId: this.sessionId,
+          workspaceRoot: process.cwd(),
         };
 
         // Permission check

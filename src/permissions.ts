@@ -48,7 +48,10 @@ export class PermissionSystem {
       case 'deny':
         return { allowed: false, level, reason: `Tool "${tool}" is denied for agent "${context.agent}"` };
       case 'restricted':
-        return { allowed: true, level, reason: 'restricted' };
+        // ponytail: restricted is an alias of 'ask' for now.
+        // TODO: implement full restrictions system with AgentConfig.restrictions
+        // e.g. { bash: { allowedCommands: ["git", "npm", "ls"] } }
+        return { allowed: false, level, reason: `Tool "${tool}" is restricted for agent "${context.agent}"` };
       case 'ask':
       default:
         return { allowed: false, level, reason: `Tool "${tool}" requires confirmation` };

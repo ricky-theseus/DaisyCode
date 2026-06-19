@@ -1,7 +1,14 @@
 import { readFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import type { Tool } from './types.js';
 
 const DEFAULT_MAX_BYTES = 1_048_576; // 1MB
+
+function isPathTraversal(requested: string, workspaceRoot: string | undefined): boolean {
+  if (!workspaceRoot) return false;
+  const resolved = resolve(workspaceRoot, requested);
+  return !resolved.startsWith(resolve(workspaceRoot));
+}
 
 export const readTool: Tool = {
   name: 'read',
@@ -16,8 +23,13 @@ export const readTool: Tool = {
     },
     required: ['path'],
   },
-  async execute(args) {
-    const path = String(args.path ?? '');
+  async execute(args, context) {
+    const rawPath = String(args.path ?? '');
+    const workspaceRoot = context?.workspaceRoot;
+    if (isPathTraversal(rawPath, workspaceRoot)) {
+      return { error: 'path_traversal_denied', path: rawPath };
+    }
+    const path = workspaceRoot ? resolve(workspaceRoot, rawPath) : rawPath;
     const offset = typeof args.offset === 'number' ? args.offset : 0;
     const limit = typeof args.limit === 'number' ? args.limit : 2000;
     const maxBytes = typeof args.maxBytes === 'number' ? args.maxBytes : DEFAULT_MAX_BYTES;

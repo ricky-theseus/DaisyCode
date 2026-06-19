@@ -58,6 +58,7 @@ export interface ToolContext {
   permissions: AgentPermissions;
   signal?: AbortSignal;
   sessionId: string;
+  workspaceRoot?: string;
 }
 
 export type AgentEvent =
