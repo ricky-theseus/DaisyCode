@@ -1,7 +1,7 @@
 ---
 description: 系统架构师，负责系统设计、技术选型、架构决策
 mode: subagent
-model: anthropic/claude-sonnet-4-5
+model: deepseek/deepseek-reasoner
 color: "#7c3aed"
 temperature: 0.2
 permission:

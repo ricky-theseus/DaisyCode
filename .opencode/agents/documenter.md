@@ -1,7 +1,7 @@
 ---
 description: 技术文档工程师，负责项目文档编写和维护
 mode: subagent
-model: anthropic/claude-sonnet-4-5
+model: opencode/zen-free
 color: "#0891b2"
 temperature: 0.4
 permission:

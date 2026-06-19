@@ -1,7 +1,7 @@
 ---
 description: 代码审查官，负责 Code Review、安全审计和质量把关
 mode: subagent
-model: anthropic/claude-sonnet-4-5
+model: deepseek/deepseek-chat
 color: "#dc2626"
 temperature: 0.1
 permission:

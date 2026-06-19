@@ -1,7 +1,7 @@
 ---
 description: 工程师，负责功能实现和编码
 mode: subagent
-model: anthropic/claude-sonnet-4-5
+model: deepseek/deepseek-chat
 color: "#059669"
 temperature: 0.3
 permission:

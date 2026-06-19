@@ -1,7 +1,7 @@
 ---
 description: 测试工程师，负责编写和执行测试
 mode: subagent
-model: anthropic/claude-sonnet-4-5
+model: opencode/zen-free
 color: "#d97706"
 temperature: 0.2
 permission:

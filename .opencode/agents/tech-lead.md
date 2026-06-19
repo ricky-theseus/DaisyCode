@@ -1,7 +1,7 @@
 ---
 description: DaisyCode 技术主管，你的专属技术管家。听懂你的需求、拆解任务、管理团队、汇报进度
 mode: primary
-model: anthropic/claude-sonnet-4-5
+model: deepseek/deepseek-chat
 color: "#2563eb"
 temperature: 0.3
 permission:

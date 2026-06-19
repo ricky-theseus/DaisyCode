@@ -1,7 +1,7 @@
 ---
 description: DevOps 工程师，负责构建、CI/CD、部署和基础设施
 mode: subagent
-model: anthropic/claude-sonnet-4-5
+model: deepseek/deepseek-chat
 color: "#0d9488"
 temperature: 0.2
 permission:
