@@ -85,6 +85,8 @@ export interface Skill {
   trigger: string[];
   description?: string;
   path?: string;
+  /** Populated after loading: the SKILL.md body (prompt to inject) */
+  prompt?: string;
 }
 
 export interface SessionConfig {

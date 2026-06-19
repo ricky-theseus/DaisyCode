@@ -3,9 +3,13 @@
 import { parseArgs } from 'node:util';
 import { loadConfig, ensureSessionDir } from './config.js';
 import { createDefaultRegistry } from './tools/registry.js';
+import { createTaskTool } from './tools/task.js';
 import { PermissionSystem } from './permissions.js';
 import { DeepSeekAdapter } from './model-adapter.js';
 import { Agent } from './agent-loop.js';
+import { Orchestrator } from './orchestrator.js';
+import { SkillsLoader } from './skills/loader.js';
+import { SkillsMatcher } from './skills/matcher.js';
 import { createSession } from './session.js';
 import { startRepl } from './repl.js';
 
@@ -27,7 +31,7 @@ Usage:
 
 Options:
   -a, --agent <name>   Agent to use (default: "default")
-  -d, --dir <path>     Project directory (default: cwd)
+  -d, --dir <path>     Project directory ( default: cwd)
   -h, --help           Show this help`);
     process.exit(0);
   }
@@ -38,11 +42,20 @@ Options:
   const agentConfig = config.agent?.[agentName];
 
   // Setup
-  const registry = createDefaultRegistry();
   const permissions = new PermissionSystem();
   const model = new DeepSeekAdapter();
+  const registry = createDefaultRegistry();
+  const orchestrator = new Orchestrator(model, registry, permissions);
+  registry.register(createTaskTool(orchestrator));
   const sessionDir = ensureSessionDir(cwd);
   const session = createSession(agentName, sessionDir);
+
+  // Load skills
+  const skillsLoader = new SkillsLoader();
+  const loadedSkills = skillsLoader.loadAll(config.skill, cwd);
+  const skillsMatcher = Object.keys(loadedSkills).length > 0
+    ? new SkillsMatcher(loadedSkills)
+    : undefined;
 
   const systemPrompt = agentConfig?.description
     ? `You are ${agentName}: ${agentConfig.description}`
@@ -56,6 +69,7 @@ Options:
     agentPermissions: agentConfig?.permission ?? { read: 'allow', edit: 'ask', glob: 'allow', grep: 'allow', bash: 'ask' },
     sessionId: session.id,
     systemPrompt,
+    skills: skillsMatcher,
   });
 
   // Start REPL

@@ -2,6 +2,7 @@ import type { AgentEvent, Message, ToolCall, ToolContext, AgentPermissions } fro
 import type { ModelAdapter } from './model-adapter.js';
 import { ToolRegistry } from './tools/types.js';
 import { PermissionSystem } from './permissions.js';
+import { SkillsMatcher } from './skills/matcher.js';
 
 export interface AgentOptions {
   model: ModelAdapter;
@@ -12,6 +13,7 @@ export interface AgentOptions {
   sessionId: string;
   systemPrompt?: string;
   maxIterations?: number;
+  skills?: SkillsMatcher;
 }
 
 export class AgentAbortedError extends Error {
@@ -30,6 +32,7 @@ export class Agent {
   private sessionId: string;
   private systemPrompt: string;
   private maxIterations: number;
+  private skills?: SkillsMatcher;
 
   constructor(opts: AgentOptions) {
     this.model = opts.model;
@@ -40,6 +43,7 @@ export class Agent {
     this.sessionId = opts.sessionId;
     this.systemPrompt = opts.systemPrompt ?? 'You are a helpful AI coding assistant.';
     this.maxIterations = opts.maxIterations ?? 10;
+    this.skills = opts.skills;
   }
 
   async *run(input: string, options?: { signal?: AbortSignal }): AsyncIterable<AgentEvent> {
@@ -47,8 +51,19 @@ export class Agent {
     if (!input || input.trim() === '') return;
 
     const signal = options?.signal;
+
+    // Skills matching: inject matched skill prompts into system prompt
+    let effectiveSystemPrompt = this.systemPrompt;
+    if (this.skills) {
+      const matched = this.skills.match(input);
+      if (matched.length > 0) {
+        const skillPrompt = this.skills.buildSkillPrompt(matched);
+        effectiveSystemPrompt = `${this.systemPrompt}\n\n${skillPrompt}`;
+      }
+    }
+
     const messages: Message[] = [
-      { role: 'system', content: this.systemPrompt },
+      { role: 'system', content: effectiveSystemPrompt },
       { role: 'user', content: input },
     ];
 

@@ -29,4 +29,16 @@ export class ToolRegistry {
   has(name: string): boolean {
     return this.tools.has(name);
   }
+
+  unregister(name: string): void {
+    this.tools.delete(name);
+  }
+
+  unregisterByPrefix(prefix: string): void {
+    for (const [name] of this.tools) {
+      if (name.startsWith(prefix)) {
+        this.tools.delete(name);
+      }
+    }
+  }
 }
