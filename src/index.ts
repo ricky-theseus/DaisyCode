@@ -35,7 +35,7 @@ Commands:
   process.exit(exitCode);
 }
 
-const VERSION = '1.0.3';
+const VERSION = '1.0.4';
 
 async function main() {
   const { values, positionals } = parseArgs({

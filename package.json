@@ -1,6 +1,6 @@
 {
   "name": "daisycode",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "AI Coding Agent runtime — lightweight, extensible, MCP-powered",
   "type": "module",
   "bin": {
