@@ -1,0 +1,129 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "tech-lead",
+  "model": "anthropic/claude-sonnet-4-5",
+  "agent": {
+    "tech-lead": {
+      "description": "DaisyCode 技术主管，你的专属技术管家。听懂你的需求、拆解任务、管理团队、汇报进度",
+      "mode": "primary",
+      "model": "anthropic/claude-sonnet-4-5",
+      "color": "#2563eb",
+      "temperature": 0.3,
+      "permission": {
+        "read": "allow",
+        "edit": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
+        "bash": "allow",
+        "task": "allow",
+        "websearch": "allow",
+        "webfetch": "allow",
+        "todowrite": "allow",
+        "lsp": "allow",
+        "skill": "allow"
+      }
+    },
+    "architect": {
+      "description": "系统架构师，负责系统设计、技术选型、架构决策",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-5",
+      "color": "#7c3aed",
+      "temperature": 0.2,
+      "permission": {
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
+        "edit": "deny",
+        "bash": "ask",
+        "task": "deny",
+        "websearch": "allow",
+        "webfetch": "allow"
+      }
+    },
+    "builder": {
+      "description": "工程师，负责功能实现和编码",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-5",
+      "color": "#059669",
+      "temperature": 0.3,
+      "permission": {
+        "read": "allow",
+        "edit": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
+        "bash": "allow",
+        "task": "deny",
+        "lsp": "allow"
+      }
+    },
+    "reviewer": {
+      "description": "代码审查官，负责 Code Review、安全审计和质量把关",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-5",
+      "color": "#dc2626",
+      "temperature": 0.1,
+      "permission": {
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
+        "edit": "deny",
+        "bash": "ask",
+        "task": "deny"
+      }
+    },
+    "tester": {
+      "description": "测试工程师，负责编写和执行测试",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-5",
+      "color": "#d97706",
+      "temperature": 0.2,
+      "permission": {
+        "read": "allow",
+        "edit": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
+        "bash": "allow",
+        "task": "deny"
+      }
+    },
+    "documenter": {
+      "description": "技术文档工程师，负责项目文档编写和维护",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-5",
+      "color": "#0891b2",
+      "temperature": 0.4,
+      "permission": {
+        "read": "allow",
+        "edit": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
+        "bash": "deny",
+        "task": "deny"
+      }
+    },
+    "devops": {
+      "description": "DevOps 工程师，负责构建、CI/CD、部署和基础设施",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-5",
+      "color": "#0d9488",
+      "temperature": 0.2,
+      "permission": {
+        "read": "allow",
+        "edit": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "list": "allow",
+        "bash": "allow",
+        "task": "deny",
+        "websearch": "allow",
+        "webfetch": "allow"
+      }
+    }
+  }
+}
