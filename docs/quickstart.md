@@ -1,6 +1,11 @@
 # 快速开始
 
-5 分钟跑通 DaisyCode。
+5 分钟内完成安装、配置并开始第一次对话。
+
+## 前置要求
+
+- Node.js >= 20（推荐 22 LTS）
+- npm >= 9
 
 ## 1. 安装
 
@@ -8,54 +13,49 @@
 npm install -g daisycode
 ```
 
-验证：
+验证安装：
 
 ```bash
 daisy --version
-# 应该输出 1.x.x
+# 输出示例：1.2.0
 ```
 
-> Node.js 版本要求 >= 20。用 `node --version` 检查。
+## 2. 配置 AI Provider
 
-## 2. 首次启动
-
-直接运行 `daisy`，会自动进入配置向导：
+首次运行 `daisy` 会自动进入配置向导：
 
 ```bash
 daisy
 ```
 
-你会看到交互菜单，选一个免费模型就能开始：
+输出示例：
 
 ```
-  🌼 DaisyCode — 首次启动
+  DaisyCode — 首次启动
 
-  还没找到 AI 模型配置，选一个方式开始：
+  选择 AI Provider:
 
-   1) ☁️ Groq (free·recommended)    — Llama 3.3 70B, fast inference
-   2) 🌥️ Cloudflare Workers AI (free)  — Llama 3.2, DeepSeek R1
-   3) 🏠 Ollama (local)             — auto-detect if running
-   4) 🇨🇳 DeepSeek                    — paid, China-friendly
-   5) 🤖 OpenAI                      — paid, GPT series
-   6) 🧠 Anthropic                   — paid, Claude series
-   7) ⚙️ Custom (OpenAI-compatible)   — any baseURL
-   8) 🎮 Demo mode                   — no AI, just testing
+   1) DeepSeek
+   2) OpenAI
+   3) Anthropic
+   4) Groq
+   5) Custom (OpenAI-compatible)
 
-  Choice [1]:
+  请输入编号 [1]:
 ```
 
-**推荐选 1 (Groq)** — 免费、无需绑定信用卡、极速推理。
+推荐选择 **4 (Groq)** — 免费、无需绑定信用卡、推理速度快。
 
-按提示输入 API Key 后，DaisyCode 自动启动。
+按提示输入 API Key 后，DaisyCode 自动进入交互模式。
 
 ## 3. 初始化项目
 
 ```bash
-cd 你的项目目录
+cd /path/to/your/project
 daisy init
 ```
 
-这会在当前目录生成 `daisy.jsonc` 配置文件。
+在当前目录生成 `daisy.jsonc` 配置文件。
 
 ## 4. 第一次对话
 
@@ -63,25 +63,27 @@ daisy init
 daisy
 ```
 
-进入交互模式后，直接说：
+进入交互模式后，输入：
 
 ```
-> 帮我创建一个 hello.js，输出 "Hello DaisyCode!"
+> 创建一个 hello.js，输出 "Hello DaisyCode!"
 ```
 
-DaisyCode 会创建文件、写代码。编辑文件时会问你"可以吗？"，输入 `y` 确认。
+DaisyCode 会分析需求、创建文件。写文件时会征求确认：
 
-退出按 `Ctrl+C` 或输入 `/exit`。
+```
+要创建 hello.js，可以吗？(y/N)
+```
 
-## 5. 加一个 MCP 工具
+输入 `y` 确认。退出按 `Ctrl+C` 或输入 `/exit`。
 
-MCP 让 AI 能用外部工具。比如加一个 GitHub 工具：
+## 5. 添加 MCP 工具（可选）
 
-在 `daisy.jsonc` 里加上：
+MCP 让 AI 能调用外部工具。以 GitHub 为例，编辑 `daisy.jsonc`：
 
 ```jsonc
 {
-  "mcpServers": {
+  "mcp": {
     "github": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-github"],
@@ -93,7 +95,7 @@ MCP 让 AI 能用外部工具。比如加一个 GitHub 工具：
 }
 ```
 
-然后重启 DaisyCode，AI 就能操作 GitHub 了：
+重启 DaisyCode，AI 即可操作 GitHub：
 
 ```
 > 看看我的仓库有哪些 open issue
@@ -101,6 +103,6 @@ MCP 让 AI 能用外部工具。比如加一个 GitHub 工具：
 
 ## 下一步
 
-- [配置详解](configuration.md) — 所有配置项
-- [MCP 扩展](mcp.md) — 更多 MCP 工具
-- [示例合集](examples/hello-world.md) — 从例子学
+- [配置详解](configuration.md) — 完整配置项参考
+- [MCP 扩展](mcp.md) — 更多 MCP 工具接入
+- [示例合集](examples/hello-world.md) — 从实战中学习

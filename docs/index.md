@@ -1,59 +1,57 @@
-# DaisyCode 文档
+# DaisyCode
 
-DaisyCode 是一个 **AI 编程助手**，直接在终端里跑，不用开 IDE 插件。
+**终端内的 AI 编程助手。** 无需 IDE 插件，直接在命令行中与 AI 协作完成编码任务。
 
-## 它能干什么？
+## 核心特性
 
-**场景 1：AI 帮你写代码**
+- **对话式编程** — 自然语言描述需求，AI 自动读写文件、执行命令、迭代修改
+- **多模型支持** — 内置 DeepSeek、OpenAI、Anthropic、Groq 等 Provider，支持自定义兼容端点
+- **MCP 扩展** — 通过 Model Context Protocol 接入数据库、GitHub、浏览器等外部工具
+- **多 Agent 协作** — 定义不同角色（架构师、开发者、审查员），分工完成复杂任务
+- **Skills 注入** — 通过结构化文档注入团队规范、框架最佳实践、领域知识
+- **权限管控** — 每个 Agent 独立配置读写/执行权限，防止误操作
+- **会话管理** — 自动保存历史，支持恢复、导出、分支探索
+- **零依赖内核** — 5 个内置工具（读/写/搜索/执行），其余能力通过 MCP 按需加载
 
-```bash
-cd 你的项目
-daisy "帮我写一个 Express 服务器，带用户注册登录"
+## 架构概览
+
+```
+┌─────────────────────────────────────────────┐
+│                   CLI 层                      │
+│   daisy / daisy init / daisy connect /       │
+│   daisy export / daisy migrate / ...         │
+├─────────────────────────────────────────────┤
+│               Agent 调度引擎                   │
+│   ┌─────────┐ ┌──────────┐ ┌──────────┐     │
+│   │ default │ │architect │ │ reviewer │ ...  │
+│   └────┬────┘ └────┬─────┘ └────┬─────┘     │
+│        └───────────┼────────────┘            │
+├────────────────────┼────────────────────────┤
+│              工具层 │                         │
+│   ┌──────┐ ┌──────┐ ┌──────┐ ┌───────────┐  │
+│   │ read │ │ edit │ │ bash │ │ MCP 扩展   │  │
+│   └──────┘ └──────┘ └──────┘ └───────────┘  │
+├─────────────────────────────────────────────┤
+│               Provider 适配层                  │
+│   DeepSeek / OpenAI / Anthropic / Groq / ...  │
+└─────────────────────────────────────────────┘
 ```
 
-DaisyCode 会读你的项目文件、写代码、跑命令，全程对话式交互。
+## 文档索引
 
-**场景 2：接入 MCP 工具**
+| 文档 | 内容 |
+|------|------|
+| [快速开始](quickstart.md) | 5 分钟完成安装并开始第一次对话 |
+| [安装指南](installation.md) | 系统要求、安装方式、故障排查 |
+| [配置参考](configuration.md) | daisy.jsonc 完整字段说明 |
+| [模型 Provider](providers.md) | 各 Provider 配置、环境变量、模型列表 |
+| [CLI 命令](cli.md) | 全部命令、选项、REPL 内部命令 |
+| [MCP 扩展](mcp.md) | 工具扩展机制、配置格式、自定义开发 |
+| [Skills 系统](skills.md) | 专业知识注入、SKILL.md 格式、加载路径 |
+| [自定义 Agent](agents.md) | 多角色配置、权限模型、协作流程 |
 
-MCP 是 AI 界的"USB 接口"。接上数据库、GitHub、浏览器，AI 就能直接操作它们：
+### 示例
 
-```bash
-daisy "查一下 orders 表里最近 10 条记录"
-# → DaisyCode 自动调数据库 MCP 工具执行 SQL
-```
-
-**场景 3：多 Agent 协作**
-
-一个任务拆给多个 AI 角色分工：
-
-```bash
-daisy --agent architect "设计订单系统的架构"
-daisy --agent builder "按架构实现代码"
-daisy --agent reviewer "审查 builder 写的代码"
-```
-
-## 30 秒上手
-
-```bash
-npm install -g daisycode
-cd 你的项目
-export DEEPSEEK_API_KEY=sk-xxxxx
-daisy init
-daisy
-```
-
-## 文档目录
-
-| 文档 | 适合谁看 |
-|------|---------|
-| [快速开始](quickstart.md) | 所有人，5 分钟跑通 |
-| [安装](installation.md) | 需要装 DaisyCode 的人 |
-| [配置](configuration.md) | 想调配置的人 |
-| [模型 Provider](providers.md) | 换模型 / 加 API |
-| [MCP 扩展](mcp.md) | 想给 AI 加工具的人 |
-| [Skills 系统](skills.md) | 想注入专业知识的人 |
-| [自定义 Agent](agents.md) | 想搞多角色协作的人 |
-| [CLI 命令](cli.md) | 命令行参考 |
-| [示例：Hello World](examples/hello-world.md) | 第一个例子 |
-| [示例：加 MCP 工具](examples/add-mcp-tool.md) | 实战 MCP |
-| [示例：自定义 Agent](examples/custom-agent.md) | 实战多 Agent |
+- [Hello World](examples/hello-world.md) — 创建并运行第一个项目
+- [接入 MCP 工具](examples/add-mcp-tool.md) — 让 AI 操作 GitHub 和数据库
+- [自定义 Agent 协作](examples/custom-agent.md) — 架构师 + 开发者 + 审查员分工

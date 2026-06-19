@@ -1,18 +1,18 @@
-# 示例：加一个 MCP 工具
+# 示例：接入 MCP 工具
 
-给 DaisyCode 加上 GitHub 工具，让 AI 能直接操作你的仓库。
+通过 MCP 为 DaisyCode 添加 GitHub 和 PostgreSQL 工具，让 AI 直接操作外部服务。
 
 ## 1. 准备 GitHub Token
 
-去 [GitHub Settings > Tokens](https://github.com/settings/tokens) 创建一个 token，勾上 `repo` 权限。
+前往 [GitHub Settings > Tokens](https://github.com/settings/tokens) 创建 Personal Access Token，勾选 `repo` 权限。
 
 ```bash
 export GITHUB_TOKEN=ghp_你的token
 ```
 
-## 2. 配置 MCP 服务器
+## 2. 配置 GitHub MCP
 
-编辑 `daisy.jsonc`，加上 `mcpServers`：
+编辑 `daisy.jsonc`，添加 `mcpServers` 配置：
 
 ```jsonc
 {
@@ -41,39 +41,43 @@ export GITHUB_TOKEN=ghp_你的token
 }
 ```
 
-> 注意：`GITHUB_TOKEN` 也可以不写在配置里，用环境变量 `export GITHUB_TOKEN=xxx` 更安全。
+> 建议通过环境变量传入 `GITHUB_TOKEN`，而非硬编码在配置文件中。
 
-## 3. 启动试试
+## 3. 验证工具加载
 
 ```bash
 daisy
 ```
 
-看看工具有没有加载成功：
+进入交互模式后，使用 `/tools` 命令查看已加载的工具：
 
 ```
 > /tools
 ```
 
-应该能看到 GitHub 相关的工具，比如 `github_list_issues`、`github_create_issue` 等。
+输出应包含 GitHub 相关工具，如 `github_list_issues`、`github_create_issue` 等。
 
-## 4. 让 AI 操作 GitHub
+## 4. 操作 GitHub
+
+查询仓库 Issue：
 
 ```
 > 看看我的 DaisyCode 仓库有哪些 open issue
 ```
 
-AI 会调用 GitHub MCP 工具查询。
+AI 会调用 GitHub MCP 工具查询并返回结果。
+
+创建 Issue：
 
 ```
-> 帮我创建一个 issue，标题是"加一个搜索功能"，内容写"需要在首页加搜索框"
+> 帮我创建一个 issue，标题是"添加搜索功能"，内容写"需要在首页加搜索框"
 ```
 
-AI 会调用 `github_create_issue` 工具。
+AI 调用 `github_create_issue` 工具完成创建。
 
-## 5. 再加一个数据库 MCP
+## 5. 添加 PostgreSQL MCP
 
-同样的方式，加个 PostgreSQL 工具：
+同样的方式接入数据库工具：
 
 ```jsonc
 {
@@ -100,16 +104,16 @@ AI 会调用 `github_create_issue` 工具。
 }
 ```
 
-然后 AI 就能查数据库了：
+重启后即可查询数据库：
 
 ```
 > 查一下 orders 表最近 10 条记录
 ```
 
-## 你学到了什么
+## 要点总结
 
-- MCP 服务器在 `mcpServers` 里配置
-- 每个服务器是 `command` + `args` + `env`
-- 敏感信息放 `env` 里，别硬编码
-- 加完配置重启 DaisyCode 就能用
+- MCP 服务器在 `mcpServers` 字段中配置
+- 每个服务器由 `command` + `args` + `env` 定义
+- 敏感信息通过 `env` 或环境变量传入，避免硬编码
+- 配置完成后重启 DaisyCode 生效
 - `/tools` 命令查看所有可用工具
