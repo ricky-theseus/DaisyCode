@@ -1,12 +1,14 @@
-# Custom Agents
+# 自定义 Agent
 
 ## 什么是 Custom Agents？
 
-Custom Agents 是 DaisyCode 的多 Agent 编排系统。你可以定义多个具有不同角色、权限和系统提示词的 Agent，让它们协作完成复杂任务。
+你可以定义多个 AI 角色，每个角色有不同的身份、权限、甚至用不同的模型。
 
-## 配置 Agents
+比如：一个 architect 负责设计，权限只读不改；一个 builder 负责实现，可以写代码；一个 reviewer 负责审查，不能执行命令。
 
-在 `daisy.jsonc` 中定义：
+## 配置
+
+在 `daisy.jsonc` 里定义：
 
 ```jsonc
 {
@@ -23,8 +25,8 @@ Custom Agents 是 DaisyCode 的多 Agent 编排系统。你可以定义多个具
       }
     },
     "architect": {
-      "description": "架构师，负责系统设计",
-      "systemPrompt": "你是一个经验丰富的软件架构师。在写代码之前，先设计好架构。",
+      "description": "架构师",
+      "systemPrompt": "你是软件架构师。写代码之前先设计架构。",
       "permission": {
         "read": "allow",
         "edit": "deny",
@@ -35,7 +37,7 @@ Custom Agents 是 DaisyCode 的多 Agent 编排系统。你可以定义多个具
     },
     "reviewer": {
       "description": "代码审查员",
-      "systemPrompt": "你是一个严格的代码审查员。检查代码质量、安全性和性能。",
+      "systemPrompt": "你是严格的代码审查员。检查代码质量、安全性和性能。",
       "permission": {
         "read": "allow",
         "edit": "deny",
@@ -43,129 +45,62 @@ Custom Agents 是 DaisyCode 的多 Agent 编排系统。你可以定义多个具
         "grep": "allow",
         "bash": "deny"
       }
-    },
-    "tester": {
-      "description": "测试工程师",
-      "systemPrompt": "你是一个测试工程师。编写全面的测试用例。",
-      "permission": {
-        "read": "allow",
-        "edit": "ask",
-        "glob": "allow",
-        "grep": "allow",
-        "bash": "ask"
-      }
     }
   }
 }
 ```
 
-## 使用 Agents
+## 使用
 
-### 在 REPL 中切换
+### 在对话中切换
 
 ```
 > /agent architect
 切换到 architect 模式
 
-> 设计一个微服务架构
-（architect 开始工作）
+> 设计一个用户认证系统
+（architect 开始设计）
 
-> /agent tester
-切换到 tester 模式
+> /agent reviewer
+切换到 reviewer 模式
 
-> 为上面的服务编写测试
-（tester 开始工作）
+> 审查上面设计的代码
+（reviewer 开始审查）
 ```
 
 ### 命令行指定
 
 ```bash
-daisy --agent architect "设计一个用户认证系统"
-```
-
-## Agent 编排
-
-DaisyCode 支持多 Agent 自动编排。当一个任务需要多个角色协作时，Orchestrator 会自动分派：
-
-1. **architect** 设计系统架构
-2. **builder** 实现代码
-3. **reviewer** 审查代码
-4. **tester** 编写测试
-
-### 编排流程
-
-```
-用户请求 → Orchestrator 分析任务
-  → 分配给 architect（设计）
-  → 分配给 builder（实现）
-  → 分配给 reviewer（审查）
-  → 分配给 tester（测试）
-  → 汇总结果返回用户
+daisy --agent reviewer "审查 src/ 目录下的代码"
 ```
 
 ## Agent 配置项
 
 | 字段 | 说明 | 必填 |
 |------|------|------|
-| `description` | Agent 角色描述 | 是 |
+| `description` | 角色描述 | 是 |
 | `systemPrompt` | 系统提示词 | 否 |
 | `permission` | 权限配置 | 是 |
-| `model` | 使用的模型（可选，覆盖全局） | 否 |
-| `temperature` | 模型温度（可选） | 否 |
+| `model` | 单独指定模型 | 否 |
+| `temperature` | 单独指定温度 | 否 |
 
 ## 权限配置
 
-每个 Agent 可以独立配置权限：
+每个 agent 独立配置权限：
 
 ```jsonc
 {
-  "read": "allow",    // 允许读取
-  "edit": "ask",      // 编辑需要确认
-  "glob": "allow",    // 允许搜索
-  "grep": "allow",    // 允许搜索
+  "read": "allow",    // 读文件，不问
+  "edit": "ask",      // 写文件，先问
+  "glob": "allow",    // 搜文件，不问
+  "grep": "allow",    // 搜内容，不问
   "bash": "deny"      // 禁止执行命令
 }
 ```
 
 ## 最佳实践
 
-### 1. 职责分离
-
-为不同角色设置不同的权限。例如，architect 不需要编辑代码，reviewer 不需要执行命令。
-
-### 2. 系统提示词
-
-精心设计每个 Agent 的系统提示词，明确其职责和行为准则。
-
-### 3. 模型选择
-
-可以为特定 Agent 指定不同的模型。例如，architect 使用更强的推理模型，tester 使用更快的模型。
-
-### 4. 渐进式复杂
-
-从简单的单 Agent 开始，随着需求增长逐步引入多 Agent 编排。
-
-## 示例场景
-
-### 代码审查流程
-
-```jsonc
-{
-  "agent": {
-    "default": { /* ... */ },
-    "reviewer": {
-      "description": "代码审查员",
-      "systemPrompt": "检查代码质量、安全性、性能。输出审查报告。",
-      "permission": {
-        "read": "allow",
-        "edit": "deny",
-        "glob": "allow",
-        "grep": "allow",
-        "bash": "deny"
-      }
-    }
-  }
-}
-```
-
-使用：`daisy --agent reviewer "审查 src/ 目录下的代码"`
+1. **职责分离** — architect 不需要写代码，reviewer 不需要跑命令
+2. **提示词要具体** — 说清楚这个角色该干什么、不该干什么
+3. **不同角色用不同模型** — architect 用更强的推理模型，tester 用快的
+4. **从简单开始** — 先一个 default agent 跑通，再加角色

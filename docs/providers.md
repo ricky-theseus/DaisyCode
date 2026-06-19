@@ -1,118 +1,86 @@
-# 模型供应方配置
+# 模型 Provider 配置
 
-## 支持的 Provider
+DaisyCode 支持多个 AI 模型，自动检测你配了哪个 API Key 就用哪个。
 
-DaisyCode 支持多个 AI 模型供应方，自动检测可用的 API Key 并选择对应的 Provider。
+## 自动检测
 
-## Provider 自动检测
+优先级：`DEEPSEEK_API_KEY` > `ANTHROPIC_API_KEY` > `OPENAI_API_KEY`
 
-按以下优先级自动选择：
-
-1. `DEEPSEEK_API_KEY` → DeepSeek
-2. `ANTHROPIC_API_KEY` → Anthropic
-3. `OPENAI_API_KEY` → OpenAI
-
-也可以在配置文件中显式指定。
+配一个就行，不用全配。
 
 ## DeepSeek
 
-### 配置
+性价比高，国内访问快，推荐日常开发用。
 
 ```bash
-export DEEPSEEK_API_KEY=sk-xxxxxxxxxxxxxxxx
+export DEEPSEEK_API_KEY=sk-你的key
 ```
-
-### 支持的模型
 
 | 模型 | 说明 |
 |------|------|
-| `deepseek/deepseek-chat` | 默认模型，性价比高 |
+| `deepseek/deepseek-chat` | 默认，日常够用 |
 | `deepseek/deepseek-reasoner` | 推理模型，适合复杂任务 |
-
-### 特点
-
-- 性价比高，适合日常开发
-- 支持长上下文
-- 响应速度快
 
 ## OpenAI
 
-### 配置
+生态最丰富，支持多模态。
 
 ```bash
-export OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxx
+export OPENAI_API_KEY=sk-你的key
 ```
-
-### 支持的模型
 
 | 模型 | 说明 |
 |------|------|
-| `openai/gpt-4o` | 默认，多模态 |
-| `openai/gpt-4o-mini` | 轻量版，速度快 |
+| `openai/gpt-4o` | 默认，全能 |
+| `openai/gpt-4o-mini` | 轻量版，快 |
 | `openai/o3-mini` | 推理模型 |
-
-### 特点
-
-- 生态最丰富
-- 支持多模态（图片理解）
-- 可通过 baseURL 使用兼容 API
 
 ## Anthropic
 
-### 配置
+代码能力很强，长上下文。
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxx
+export ANTHROPIC_API_KEY=sk-ant-你的key
 ```
-
-### 支持的模型
 
 | 模型 | 说明 |
 |------|------|
 | `anthropic/claude-sonnet-4-20250514` | 默认 |
 | `anthropic/claude-3-5-sonnet-20241022` | 稳定版 |
 
-### 特点
+## 自定义 API（OpenAI 兼容）
 
-- 代码能力优秀
-- 长上下文窗口
-- 安全性高
-
-## 自定义 OpenAI 兼容 API
-
-任何兼容 OpenAI API 的服务都可以使用。
-
-### 配置
+任何兼容 OpenAI API 的服务都能用，比如本地跑的 Ollama、Azure、Groq。
 
 ```bash
-export OPENAI_API_KEY=sk-xxx
+export OPENAI_API_KEY=你的key
 ```
 
-启动时指定 baseURL：
+启动时指定地址：
 
 ```bash
-daisy --model "custom-model" --base-url "https://your-api.com/v1"
+daisy --model 你的模型名 --base-url https://你的api地址/v1
 ```
 
-或在配置文件中指定：
+或者在配置里写死：
 
 ```jsonc
 {
-  "model": "custom-model",
-  "baseUrl": "https://your-api.com/v1"
+  "model": "qwen2.5-coder",
+  "baseUrl": "http://localhost:11434/v1"
 }
 ```
 
 ### 常见兼容服务
 
-- **Azure OpenAI** — `https://<resource>.openai.azure.com`
-- **Groq** — `https://api.groq.com/openai/v1`
-- **Together AI** — `https://api.together.xyz/v1`
-- **Ollama（本地）** — `http://localhost:11434/v1`
+| 服务 | baseURL |
+|------|---------|
+| Ollama（本地） | `http://localhost:11434/v1` |
+| Groq | `https://api.groq.com/openai/v1` |
+| Together AI | `https://api.together.xyz/v1` |
+| Azure OpenAI | `https://你的资源名.openai.azure.com` |
 
 ## 模型参数
-
-可以在配置文件中调整模型参数：
 
 ```jsonc
 {
@@ -124,41 +92,32 @@ daisy --model "custom-model" --base-url "https://your-api.com/v1"
 }
 ```
 
-| 参数 | 说明 | 默认值 | 范围 |
-|------|------|--------|------|
-| `temperature` | 随机性控制 | 0.7 | 0-2 |
-| `maxTokens` | 最大输出 Token | 4096 | 1-128000 |
-| `topP` | 核采样 | 0.9 | 0-1 |
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `temperature` | 随机性（0=确定，2=放飞） | 0.7 |
+| `maxTokens` | 最大输出长度 | 4096 |
+| `topP` | 核采样 | 0.9 |
 
-## 多 Provider 切换
+## 对话中切换模型
 
-可以在会话中动态切换 Provider：
+在 REPL 里随时换：
 
 ```
 > /model openai/gpt-4o
 > /model deepseek/deepseek-chat
 ```
 
-## 故障排除
+## 常见问题
 
-### API Key 无效
+### API Key 没生效
 
 ```bash
-# 检查环境变量是否设置
+# 检查有没有设上
 echo $DEEPSEEK_API_KEY
-
-# 重新设置
-export DEEPSEEK_API_KEY=sk-xxxxxxxxxxxxxxxx
 ```
 
-### 连接超时
+### 连不上
 
-- 检查网络连接
-- 确认 API 地址是否正确
-- 对于中国大陆用户，可能需要配置代理
-
-### 配额不足
-
-- 检查 API 账户余额
-- 确认是否有速率限制
-- 考虑切换到其他 Provider
+- 检查网络，国内用户可能需要代理
+- 确认 API 地址对不对
+- 看看账户余额够不够

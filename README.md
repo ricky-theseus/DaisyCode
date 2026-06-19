@@ -57,6 +57,8 @@ export DEEPSEEK_API_KEY=sk-xxx
 daisy
 ```
 
+📖 **[完整文档](docs/)** &nbsp;|&nbsp; [快速上手](docs/quickstart.md) &nbsp;|&nbsp; [CLI 命令](docs/cli.md) &nbsp;|&nbsp; [配置指南](docs/configuration.md)
+
 ### 使用自定义 OpenAI 兼容 API
 
 ```bash

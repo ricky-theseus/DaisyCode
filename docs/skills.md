@@ -2,21 +2,13 @@
 
 ## 什么是 Skills？
 
-Skills 是 DaisyCode 的专业技能注入系统。通过 Skills，你可以让 AI Agent 掌握特定领域的专业知识，如 TypeScript 最佳实践、React 组件设计模式、数据库优化技巧等。
+Skills 是给 AI 注入专业知识的"技能包"。比如你希望 AI 写 TypeScript 时遵守你们团队的规范，写一个 SKILL.md 就行。
 
-## 工作原理
-
-Skills 本质上是结构化的提示词模板，在 Agent 初始化时注入到系统提示词中。每个 Skill 包含：
-
-- **领域知识** — 特定领域的最佳实践和规范
-- **代码示例** — 符合规范的代码模板
-- **约束规则** — 需要遵守的限制条件
+Skills 本质上是结构化的提示词，在 AI 启动时注入到系统提示里。
 
 ## 内置 Skills
 
-DaisyCode 内置了一些常用 Skills：
-
-| Skill | 说明 |
+| Skill | 用途 |
 |-------|------|
 | `typescript` | TypeScript 编码规范 |
 | `react` | React 组件开发指南 |
@@ -24,73 +16,59 @@ DaisyCode 内置了一些常用 Skills：
 | `testing` | 测试编写规范 |
 | `security` | 安全编码实践 |
 
-## 启用 Skills
-
-在 `daisy.jsonc` 中配置：
+启用：
 
 ```jsonc
 {
   "skills": {
-    "include": ["typescript", "react", "testing"]
+    "include": ["typescript", "react"]
   }
 }
 ```
 
 ## 自定义 Skills
 
-### 创建 Skill 文件
+### 1. 创建 SKILL.md
 
-在项目目录下创建 Skills 目录：
+在项目里建个 `skills/` 目录，里面放 `.md` 文件：
 
 ```
 my-project/
 ├── skills/
-│   ├── my-skill.md
+│   ├── team-rules.md
 │   └── database.md
 └── daisy.jsonc
 ```
 
-Skill 文件格式（Markdown）：
+### 2. 写 SKILL.md
 
 ```markdown
-# My Custom Skill
+# 团队编码规范
 
-## 描述
-这个 Skill 定义了项目的编码规范。
+## 命名规则
+- 变量和函数用 camelCase
+- 类和组件用 PascalCase
+- 常量用 UPPER_SNAKE_CASE
 
-## 规则
-
-### 命名规范
-- 使用 camelCase 命名变量和函数
-- 使用 PascalCase 命名类和组件
-- 常量使用 UPPER_SNAKE_CASE
-
-### 文件组织
+## 文件组织
 - 每个组件一个文件
-- 测试文件与源文件同级
-- 样式文件使用 CSS Modules
+- 测试文件和源文件放同级目录
+- 样式用 CSS Modules
 
 ## 代码示例
 
-### 组件示例
 ```typescript
-interface ButtonProps {
-  label: string;
-  onClick: () => void;
-  variant?: 'primary' | 'secondary';
-}
+// ✅ 正确
+const userName = "张三";
+function getUser() { }
 
-export function Button({ label, onClick, variant = 'primary' }: ButtonProps) {
-  return (
-    <button className={styles[variant]} onClick={onClick}>
-      {label}
-    </button>
-  );
-}
+// ❌ 错误
+const user_name = "张三";
+function get_user() { }
 ```
 ```
 
-### 配置自定义 Skills
+### 3. 配置
 
 ```jsonc
 {
@@ -103,63 +81,17 @@ export function Button({ label, onClick, variant = 'primary' }: ButtonProps) {
 
 ## Skills 优先级
 
-当多个 Skills 同时启用时，按以下优先级合并：
+多个 skills 同时启用时，按这个顺序合并：
 
-1. 自定义 Skills（`paths` 中配置的）
-2. 内置 Skills（`include` 中配置的）
+1. 自定义 skills（`paths` 里的）— 优先级最高
+2. 内置 skills（`include` 里的）
 3. 默认系统提示词
 
-如果存在冲突规则，自定义 Skills 覆盖内置 Skills。
+冲突时自定义覆盖内置。
 
 ## 最佳实践
 
-### 1. 保持专注
-
-每个 Skill 聚焦一个领域，不要在一个 Skill 文件中塞入太多内容。
-
-### 2. 提供示例
-
-好的 Skill 应该包含具体的代码示例，而不仅仅是抽象规则。
-
-### 3. 版本控制
-
-将 Skills 文件纳入版本控制，团队共享。
-
-### 4. 渐进式启用
-
-先启用少量核心 Skills，根据实际效果逐步增加。
-
-## 示例：项目级 Skills
-
-### React 项目
-
-```jsonc
-{
-  "skills": {
-    "include": ["typescript", "react", "testing"],
-    "paths": ["./skills"]
-  }
-}
-```
-
-### Node.js API 项目
-
-```jsonc
-{
-  "skills": {
-    "include": ["typescript", "node", "security"],
-    "paths": ["./skills"]
-  }
-}
-```
-
-### 全栈项目
-
-```jsonc
-{
-  "skills": {
-    "include": ["typescript", "react", "node", "testing", "security"],
-    "paths": ["./skills"]
-  }
-}
-```
+1. **一个 skill 只讲一件事** — 别把 TypeScript 规范和数据库规范写一起
+2. **给代码示例** — 抽象规则不如直接给例子
+3. **放版本控制** — 团队共享，大家一起维护
+4. **从少到多** — 先加一两个核心 skill，不够再加
