@@ -2,6 +2,41 @@
   "$schema": "https://opencode.ai/config.json",
   "default_agent": "tech-lead",
   "model": "deepseek/deepseek-chat",
+  "plugin": [
+    "oh-my-opencode",
+    "opencode-skills-collection",
+    "opencode-supermemory",
+    "opencode-pty",
+    "opencode-worktree",
+    "opencode-notify",
+    "opencode-websearch-cited"
+  ],
+  "mcp": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp"]
+    },
+    "firecrawl": {
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"]
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"]
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "composio": {
+      "type": "remote",
+      "url": "https://connect.composio.dev/mcp"
+    }
+  },
   "agent": {
     "tech-lead": {
       "description": "DaisyCode 技术主管，你的专属技术管家。听懂你的需求、拆解任务、管理团队、汇报进度",
