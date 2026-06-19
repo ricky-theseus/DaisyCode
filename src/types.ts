@@ -103,6 +103,7 @@ export interface AgentConfig {
   temperature?: number;
   permission?: AgentPermissions;
   color?: string;
+  systemPrompt?: string;
 }
 
 export interface DaisyConfig {
