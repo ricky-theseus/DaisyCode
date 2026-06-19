@@ -7,6 +7,19 @@ function ask(rl: readline.Interface, question: string): Promise<string> {
   return new Promise(resolve => rl.question(question, resolve));
 }
 
+function askSecret(rl: readline.Interface, question: string): Promise<string> {
+  return new Promise(resolve => {
+    const stdin = process.stdin;
+    const wasRaw = stdin.isRaw;
+    if (wasRaw !== true) stdin.setRawMode?.(true);
+    rl.question(question, answer => {
+      if (wasRaw !== true) stdin.setRawMode?.(false);
+      console.log(); // newline after hidden input
+      resolve(answer);
+    });
+  });
+}
+
 const PROVIDERS = [
   { key: 'deepseek', label: 'DeepSeek', defaultModel: 'deepseek-chat' },
   { key: 'openai', label: 'OpenAI', defaultModel: 'gpt-4o' },
@@ -53,7 +66,7 @@ async function setupProvider(provider: typeof PROVIDERS[number]): Promise<boolea
   if (provider.key === 'custom') {
     const baseURL = (await ask(rl, '  Base URL (https://your-api/v1): ')).trim();
     if (!baseURL) { rl.close(); return false; }
-    const key = (await ask(rl, '  API Key: ')).trim();
+    const key = (await askSecret(rl, '  API Key: ')).trim();
     if (!key) { rl.close(); return false; }
     const model = (await ask(rl, '  模型名: ')).trim() || 'custom-model';
     setProvider('custom', { apiKey: key, baseURL }, { model });
@@ -62,7 +75,7 @@ async function setupProvider(provider: typeof PROVIDERS[number]): Promise<boolea
     return true;
   }
 
-  apiKey = (await ask(rl, `  请输入 ${provider.label} API Key: `)).trim();
+  apiKey = (await askSecret(rl, `  请输入 ${provider.label} API Key: `)).trim();
   if (!apiKey) { rl.close(); return false; }
 
   const model = getDefaultModel(provider.key);

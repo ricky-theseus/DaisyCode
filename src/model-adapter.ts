@@ -500,16 +500,16 @@ export function createModel(opts?: ModelFactoryOptions): ModelAdapter | null {
     case 'custom':
       return new OpenAICompatibleAdapter({
         baseURL: opts?.baseURL ?? providerConfig?.baseURL,
-        apiKey: resolveKey(''),
+        apiKey: opts?.apiKey ?? providerConfig?.apiKey ?? '',
         timeout: opts?.timeout,
-        model: opts?.model ?? providerConfig?.baseURL ? 'custom-model' : undefined,
+        model: opts?.model ?? (providerConfig?.baseURL ? 'custom-model' : undefined),
       });
     case 'none':
       return null;
     default:
       return new OpenAICompatibleAdapter({
         baseURL: opts?.baseURL ?? providerConfig?.baseURL,
-        apiKey: resolveKey(''),
+        apiKey: opts?.apiKey ?? providerConfig?.apiKey ?? '',
         timeout: opts?.timeout,
         model: opts?.model ?? provider,
       });
