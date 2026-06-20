@@ -42,11 +42,11 @@ Commands:
   (no command)         Start interactive REPL
 
   Options:
-   -a, --agent <name>   Agent to use (default: "default")
-   -d, --dir <path>     Project directory (default: cwd)
-   --no-tui             Force readline REPL even in TTY
-   -v, --version        Show version number
-   -h, --help           Show this help`);
+    -a, --agent <name>   Agent to use (default: "default")
+    -d, --dir <path>     Project directory (default: cwd)
+    --tui <mode>         TUI mode: "ink" (default), "ansi", or "none"
+    -v, --version        Show version number
+    -h, --help           Show this help`);
   process.exit(exitCode);
 }
 
@@ -60,6 +60,7 @@ async function main() {
       version: { type: 'boolean', short: 'v' },
       help: { type: 'boolean', short: 'h' },
       'no-tui': { type: 'boolean', default: false },
+      tui: { type: 'string' },
       'dry-run': { type: 'boolean', default: false },
       force: { type: 'boolean', default: false },
       from: { type: 'string' },
@@ -183,12 +184,15 @@ async function main() {
     skills: skillsMatcher,
   });
 
-  // Try Ink TUI plugin first, fallback to ANSI TUI, then REPL
-  const useTui = stdin.isTTY && !values['no-tui'];
+  // TUI mode: --tui ink|ansi|none, defaults to ink when TTY
+  const tuiMode = values.tui ?? (stdin.isTTY ? 'ink' : 'none');
+  const noTui = values['no-tui'] || tuiMode === 'none';
 
-  if (useTui) {
+  if (tuiMode === 'ink' && !noTui) {
     const launched = await tryInkTui();
     if (launched) return;
+  }
+  if ((tuiMode === 'ink' || tuiMode === 'ansi') && !noTui) {
     await startTui(agent, agentName, session, memoryManager);
   } else {
     await startRepl(agent, agentName);
