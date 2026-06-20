@@ -15,6 +15,7 @@ import { startRepl } from './repl.js';
 import { migrate } from './commands/migrate.js';
 import { initProject } from './commands/init.js';
 import { connectCommand, showOnboardingMenu } from './commands/connect.js';
+import { compatCommand } from './commands/compat.js';
 
 function showHelp(exitCode = 0): void {
   console.log(`DaisyCode — AI Coding Agent
@@ -28,6 +29,12 @@ Commands:
   connect remove <prov> Remove a provider
   migrate              Migrate opencode.json → daisy.jsonc
   init                 Initialize a new DaisyCode project
+  compat               Import Claude Code / OpenCode config
+  compat --list        List imported compat configurations
+  compat --dry-run     Preview import without writing
+  compat --force       Overwrite existing compat config
+  compat --from claude  Only import Claude Code config
+  compat --from opencode Only import OpenCode config
   export <sessionId>   Export a session to Markdown
   (no command)         Start interactive REPL
 
@@ -48,6 +55,10 @@ async function main() {
       dir: { type: 'string', short: 'd' },
       version: { type: 'boolean', short: 'v' },
       help: { type: 'boolean', short: 'h' },
+      'dry-run': { type: 'boolean', default: false },
+      force: { type: 'boolean', default: false },
+      from: { type: 'string' },
+      list: { type: 'boolean', default: false },
     },
     allowPositionals: true,
     strict: true,
@@ -80,6 +91,16 @@ async function main() {
 
   if (command === 'init') {
     await initProject(cwd);
+    return;
+  }
+
+  if (command === 'compat') {
+    compatCommand(cwd, {
+      dryRun: values['dry-run'] === true,
+      force: values.force === true,
+      from: values.from as 'claude' | 'opencode' | undefined,
+      list: values.list === true,
+    });
     return;
   }
 
