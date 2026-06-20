@@ -116,8 +116,8 @@ export function shouldSummarize(session: SessionConfig): boolean {
   const hasSummary = !!(session as { summary?: string }).summary;
   if (!hasSummary) return count >= 10;
   // After first summary, update every 20 messages
-  // Estimate last summary point: find the closest 10 + 20n threshold
-  for (let n = 0; ; n++) {
+  // Start from n=1 to skip the initial 10-message threshold
+  for (let n = 1; ; n++) {
     const threshold = 10 + n * 20;
     if (threshold > count) return false;
     if (threshold === count) return true;

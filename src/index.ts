@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { parseArgs } from 'node:util';
+import { stdin } from 'node:process';
 import { loadConfig, ensureSessionDir } from './config.js';
 import { createDefaultRegistry } from './tools/registry.js';
 import { createTaskTool } from './tools/task.js';
@@ -10,8 +11,10 @@ import { Agent } from './agent-loop.js';
 import { Orchestrator } from './orchestrator.js';
 import { SkillsLoader } from './skills/loader.js';
 import { SkillsMatcher } from './skills/matcher.js';
-import { createSession, loadSession, saveExportedSession } from './session.js';
+import { createSession, loadSession, saveExportedSession, addMessage } from './session.js';
 import { startRepl } from './repl.js';
+import { MemoryManager } from './memory/manager.js';
+import { TUI } from './tui/tui.js';
 import { migrate } from './commands/migrate.js';
 import { initProject } from './commands/init.js';
 import { connectCommand, showOnboardingMenu } from './commands/connect.js';
@@ -41,6 +44,7 @@ Commands:
   Options:
    -a, --agent <name>   Agent to use (default: "default")
    -d, --dir <path>     Project directory (default: cwd)
+   --no-tui             Force readline REPL even in TTY
    -v, --version        Show version number
    -h, --help           Show this help`);
   process.exit(exitCode);
@@ -55,6 +59,7 @@ async function main() {
       dir: { type: 'string', short: 'd' },
       version: { type: 'boolean', short: 'v' },
       help: { type: 'boolean', short: 'h' },
+      'no-tui': { type: 'boolean', default: false },
       'dry-run': { type: 'boolean', default: false },
       force: { type: 'boolean', default: false },
       from: { type: 'string' },
@@ -154,9 +159,18 @@ async function main() {
     ? new SkillsMatcher(loadedSkills)
     : undefined;
 
+  // MemoryManager: cross-session memory
+  const memoryManager = new MemoryManager({ projectDir: cwd });
+  const memoryPrompt = memoryManager.buildMemoryPrompt();
+
   const systemPrompt = agentConfig?.description
     ? `You are ${agentName}: ${agentConfig.description}`
     : 'You are a helpful AI coding assistant.';
+
+  // Prepend memory prompt if non-empty
+  const fullSystemPrompt = memoryPrompt
+    ? `${memoryPrompt}\n\n${systemPrompt}`
+    : systemPrompt;
 
   const agent = new Agent({
     model,
@@ -165,11 +179,73 @@ async function main() {
     agentName,
     agentPermissions: agentConfig?.permission ?? { read: 'allow', edit: 'ask', glob: 'allow', grep: 'allow', bash: 'ask' },
     sessionId: session.id,
-    systemPrompt,
+    systemPrompt: fullSystemPrompt,
     skills: skillsMatcher,
   });
 
-  await startRepl(agent, agentName);
+  // Decide TUI vs readline REPL
+  const useTui = stdin.isTTY && !values['no-tui'];
+
+  if (useTui) {
+    await startTui(agent, agentName, session, memoryManager);
+  } else {
+    await startRepl(agent, agentName);
+  }
+}
+
+/**
+ * Start the TUI with streaming agent integration.
+ */
+async function startTui(
+  agent: Agent,
+  agentName: string,
+  session: import('./types.js').SessionConfig,
+  memoryManager: MemoryManager,
+): Promise<void> {
+  const tui = new TUI({
+    agentName,
+    modelName: (agent as unknown as Record<string, unknown>)['model']?.constructor?.name ?? 'unknown',
+    sessionId: session.id,
+    onSend: async function* (input: string) {
+      const events = agent.run(input);
+      for await (const event of events) {
+        switch (event.type) {
+          case 'text_delta':
+            tui.streamToken(event.content);
+            break;
+          case 'tool_call':
+            tui.appendMessage(`⚡ ${event.tool}(${JSON.stringify(event.args)})`);
+            break;
+          case 'tool_result':
+            tui.appendMessage(`→ ${event.tool}: ${JSON.stringify(event.result).slice(0, 200)}`);
+            break;
+          case 'error':
+            tui.appendMessage(`Error: ${event.error.message}`);
+            break;
+          case 'done':
+            tui.updateStatus({ status: 'idle' });
+            // Update session memory after completion
+            addMessage(session, { role: 'user', content: input });
+            memoryManager.updateSessionMetadata(session);
+            memoryManager.updateMemory(session);
+            break;
+        }
+        yield event;
+      }
+    },
+    onSwitchSession: (_sessionId: string) => {
+      // ponytail: single-session for now
+    },
+    onExit: () => {
+      tui.stop();
+      process.exit(0);
+    },
+  });
+
+  tui.start();
+
+  // ponytail: block until exit
+  await new Promise(() => {});
 }
 
 main().catch(err => {

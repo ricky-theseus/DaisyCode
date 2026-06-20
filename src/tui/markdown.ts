@@ -102,6 +102,15 @@ function renderInline(line: string): string {
     return `${fg.cyan}│ ${content}${reset}`;
   }
 
+  // Task list (must check before unordered list)
+  const taskMatch = line.match(/^[-*+]\s+\[([ xX])\]\s+(.+)$/);
+  if (taskMatch) {
+    const checked = taskMatch[1] !== ' ';
+    const content = renderInlineContent(taskMatch[2]);
+    const checkbox = checked ? `${fg.green}✓${reset}` : `${fg.gray}○${reset}`;
+    return `${checkbox} ${content}`;
+  }
+
   // Unordered list
   const ulMatch = line.match(/^[-*+]\s+(.+)$/);
   if (ulMatch) {
@@ -115,15 +124,6 @@ function renderInline(line: string): string {
     const num = olMatch[1];
     const content = renderInlineContent(olMatch[2]);
     return `${fg.green}${num}. ${content}${reset}`;
-  }
-
-  // Task list
-  const taskMatch = line.match(/^[-*+]\s+\[([ xX])\]\s+(.+)$/);
-  if (taskMatch) {
-    const checked = taskMatch[1] !== ' ';
-    const content = renderInlineContent(taskMatch[2]);
-    const checkbox = checked ? `${fg.green}✓${reset}` : `${fg.gray}○${reset}`;
-    return `${checkbox} ${content}`;
   }
 
   // Table row (simple pipe-separated)
@@ -160,11 +160,11 @@ function renderInlineContent(text: string): string {
   // Strikethrough: ~~text~~
   text = text.replace(/~~(.+?)~~/g, `${dim}$1${reset}`);
 
+  // Images: ![alt](url) → [img: alt] (must check before links)
+  text = text.replace(/!\[([^\]]*)\]\([^)]+\)/g, `${fg.magenta}[img: $1]${reset}`);
+
   // Links: [text](url) → text (underline, blue)
   text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, `${underline}${fg.blue}$1${reset}`);
-
-  // Images: ![alt](url) → [img: alt]
-  text = text.replace(/!\[([^\]]*)\]\([^)]+\)/g, `${fg.magenta}[img: $1]${reset}`);
 
   return text;
 }
