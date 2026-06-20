@@ -17,9 +17,9 @@ interface SplashProps {
 
 export default function Splash({ onSubmit }: SplashProps) {
   const [input, setInput] = useState('')
-  const placeholder = '描述你的需求，或 /help 查看命令'
+  const placeholder = 'describe your needs, or /help for commands'
 
-  useInput((value, key) => {
+  useInput((char, key) => {
     if (key.return) {
       if (input.trim()) {
         onSubmit(input.trim())
@@ -35,14 +35,13 @@ export default function Splash({ onSubmit }: SplashProps) {
       setInput('')
       return
     }
-    // printable chars only
-    if (value && value.length === 1 && !key.ctrl && !key.meta) {
-      setInput(prev => prev + value)
+    if (char && !key.ctrl && !key.meta) {
+      setInput(prev => prev + char)
     }
   })
 
   return (
-    <Box flexDirection="column" alignItems="center" justifyContent="center" height="100%">
+    <Box flexDirection="column" alignItems="center" justifyContent="center" flexGrow={1}>
       <Box marginBottom={2}>
         <Box flexDirection="column">
           {logo.map((line, i) => (
@@ -55,18 +54,17 @@ export default function Splash({ onSubmit }: SplashProps) {
       <Box
         borderStyle="round"
         borderColor={theme.primary}
-        width="60%"
         paddingX={2}
         paddingY={1}
       >
-        <Text>
-          <Text color={theme.primary}>▸ </Text>
-          {input ? (
-            <Text color={theme.text}>{input}</Text>
-          ) : (
-            <Text color={theme.textDim}>{placeholder}</Text>
-          )}
-        </Text>
+        <Box marginRight={1}>
+          <Text color={theme.primary}>▸</Text>
+        </Box>
+        {input ? (
+          <Text color={theme.text}>{input}</Text>
+        ) : (
+          <Text color={theme.textDim}>{placeholder}</Text>
+        )}
       </Box>
     </Box>
   )
