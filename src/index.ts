@@ -183,10 +183,12 @@ async function main() {
     skills: skillsMatcher,
   });
 
-  // Decide TUI vs readline REPL
+  // Try Ink TUI plugin first, fallback to ANSI TUI, then REPL
   const useTui = stdin.isTTY && !values['no-tui'];
 
   if (useTui) {
+    const launched = await tryInkTui();
+    if (launched) return;
     await startTui(agent, agentName, session, memoryManager);
   } else {
     await startRepl(agent, agentName);
@@ -194,7 +196,46 @@ async function main() {
 }
 
 /**
- * Start the TUI with streaming agent integration.
+ * Try to launch the Ink-based TUI via daisycode-tui plugin.
+ * If installed, spawns it as child and parent exits.
+ */
+async function tryInkTui(): Promise<boolean> {
+  let tuiPath: string | undefined;
+
+  // Dev mode: look for packages/tui/dist/index.js relative to src/
+  try {
+    const { resolve } = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+    const devPath = resolve(fileURLToPath(import.meta.url), '..', '..', 'packages', 'tui', 'dist', 'index.js');
+    const { statSync } = await import('node:fs');
+    statSync(devPath);
+    tuiPath = devPath;
+  } catch { /* not in dev */ }
+
+  // Production: look for globally installed daisycode-tui
+  if (!tuiPath) {
+    try {
+      const { createRequire } = await import('node:module');
+      tuiPath = createRequire(import.meta.url).resolve('daisycode-tui/dist/index.js');
+    } catch { /* not installed */ }
+  }
+
+  if (!tuiPath) return false;
+
+  const { spawn } = await import('node:child_process');
+  const child = spawn(process.execPath, [tuiPath], {
+    stdio: 'inherit',
+    env: { ...process.env },
+  });
+
+  return new Promise(resolve => {
+    child.on('exit', code => process.exit(code ?? 0));
+    child.on('error', () => resolve(false));
+  });
+}
+
+/**
+ * Start the ANSI TUI with streaming agent integration.
  */
 async function startTui(
   agent: Agent,

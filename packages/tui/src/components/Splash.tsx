@@ -2,11 +2,12 @@ import { Box, Text } from 'ink'
 import { theme } from '../theme.js'
 
 const logo = [
-  '  +-------+   +-------+   +---+   +-----------+   +---+   +---+',
-  '  | D     |   | A     |   | I |   | S     Y   |   | C |   | O |',
-  '  |   D   |   |   A   |   | I |   |   S   Y   |   |   C   |   O   |',
-  '  |     D |   |     A |   | I |   |     S Y   |   | C     |     O |',
-  '  +-------+   +-------+   +---+   +-----------+   +---+   +---+',
+  '  ██████╗     █████╗    ██╗   ███████╗  ██╗   ██╗',
+  '  ██╔══██╗   ██╔══██╗   ██║   ██╔════╝  ╚██╗ ██╔╝',
+  '  ██║  ██║   ███████║   ██║   ███████╗   ╚████╔╝ ',
+  '  ██║  ██║   ██╔══██║   ██║   ╚════██║    ╚██╔╝  ',
+  '  ██████╔╝   ██║  ██║   ██║   ███████║     ██║   ',
+  '  ╚═════╝    ╚═╝  ╚═╝   ╚═╝   ╚══════╝     ╚═╝   ',
 ]
 
 interface SplashProps {
@@ -14,7 +15,7 @@ interface SplashProps {
   prompt?: string
 }
 
-export default function Splash({ onSubmit, prompt = 'Type your question, or /help for help' }: SplashProps) {
+export default function Splash({ onSubmit, prompt = '描述你的需求，或 /help 查看命令' }: SplashProps) {
   return (
     <Box flexDirection="column" alignItems="center" justifyContent="center" height="100%">
       <Box marginBottom={2}>
@@ -34,8 +35,8 @@ export default function Splash({ onSubmit, prompt = 'Type your question, or /hel
         paddingY={1}
       >
         <Text>
-          <Text color={theme.primary}>? </Text>
-          <Text color={theme.text}>{prompt}</Text>
+          <Text color={theme.primary}>▸ </Text>
+          <Text color={theme.textDim}>{prompt}</Text>
         </Text>
       </Box>
     </Box>
